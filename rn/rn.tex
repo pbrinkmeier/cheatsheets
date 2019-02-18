@@ -5,6 +5,7 @@
 \usepackage[autostyle=true,german=quotes]{csquotes}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{graphicx}
 
 \author{Paul Brinkmeier}
 \title{Cheatsheet für Einführung in Rechnernetze}
@@ -92,6 +93,82 @@
 	Content-Provider erzeugen und stellen Inhalte bereit.
 	Sie wollen diese so nah wie möglich an den Netzrand ($\leadsto$ zu den Kunden) bringen.
 	Bspw. Google, Netflix, Amazon.
+
+	\subsection{Modellierung}
+
+	\paragraph{Modell}
+
+	Ein Modell ist ein vereinfachtes Abbild der Wirklichkeit.
+	Man setzt Modelle ein, um die wesentlichen Aspekte eines Systems darzustellen.
+	Die innere Struktur des Systems wird abstrahiert; man modelliert die Interaktion mit dem System (Black-Box).
+
+	\subsubsection{Grundmodell der Kommunikation}
+
+	\begin{itemize}
+		\item Sender und Empfänger (je einer oder mehrere).
+		\item Abstraktes Medium.
+	\end{itemize}
+
+	\paragraph{Abstraktes Medium}
+	
+	Das Medium verbindet Sender und Empfänger über eine räumliche Distanz.
+	Es stellt damit einen (Kommunikations-)Dienst zur Verfügung.
+	Den Übergang von Sender/Empfänger zum Medium nennt man Schnittstelle.
+
+	Ein abstraktes Medium trifft keinerlei Aussage über seine konkrete (physische) Umsetzung.
+
+	\paragraph{Dienstesicht}
+
+	Betrachtung eines Rechnernetzes als Black-Box.
+	Das RN erbringt einen Dienst für seine Nutzer.
+
+	Das RN entspricht hier dem abstrakten Medium.
+
+	\paragraph{Dienst}
+
+	Ein Dienst bündelt zusammengehörige Funktionen und stellt diese einem Nutzer (Dienstnehmer) zur Verfügung.
+	Einzelen Teile eines Dienstes können unabhängig voneinander in Anspruch genommen werden.
+
+	Ein \emph{Dienstzugangspunkt} (Service Access Point, SAP) stellt die Schnittstelle zu einem Dienst dar.
+
+	\emph{Dienstnehmer} nehmen eine Dienst in Anspruch.
+
+	\emph{Dienstgeber} (Diensterbringer) stellen einen Dienst zur Verfügung.
+
+	\emph{Dienstprimitive} beschreiben die Interaktionen zwischen Dienstnehmer und Dienstgeber.
+
+	Die \emph{Beschreibung eines Dienstes} reflektiert das Verhalten an den Dienstzugangspunkten zum Dienstgeber.
+
+	\begin{figure}
+		\includegraphics[width=\textwidth]{images/02-services.png}
+		\caption{Dienstesicht}
+	\end{figure}
+
+	\paragraph{Dienstprimitive}
+
+	\begin{itemize}
+		\item \emph{Request} (req) --- Dienstnehmer 1 (DN1) beauftragt Dienstgeber.
+		\item \emph{Indication} (ind) --- Dienstgeber benachrichtigt Dienstnehmer 2 (DN2) über Auftrag.
+		\item \emph{Response} (res) --- DN2 beantwortet Auftrag.
+		\item \emph{Confirmation} (cnd) --- Dienstgeber benachrichtigt DN1 über Abschluss.
+	\end{itemize}
+
+	\begin{figure}
+		\includegraphics[width=\textwidth]{images/02-primitives.png}
+		\caption{Dienstprimitive}
+	\end{figure}
+
+	\paragraph{Formen von Diensten}
+
+	\begin{itemize}
+		\item Unbestätigter Dienst --- Request (DN1), Indication (DN2).
+		\item Bestätigter Dienst --- Request (DN1), Indication (DN2), Response (DN2), Confirmation (DN1).
+	\end{itemize}
+
+	\begin{figure}
+		\includegraphics[width=\textwidth]{images/02-http-example.png}
+		\caption{Beispiel für einen bestätigten Dienst: HTTP}
+	\end{figure}
 
 	\subsection{Zuverlässiger Dienst}
 
