@@ -24,7 +24,7 @@
 	\tableofcontents
 	\newpage
 
-	\raggedright
+	% \raggedright
 
 	\section{Grundlegende Grundlagen}
 
@@ -365,6 +365,213 @@
 	Das liegt daran, dass dieses Modell sich eher mit der Zeit aus Prototypen entwickelt hat, als dass es entworfen worden wäre.
 
 	\section{Physische Schicht}
+
+	\subsection{Abstraktes Modell nach Shannon}
+
+	Allgemeine Erkenntnisse, die für alle Arten der Datenübertragung gelten (bspw. Morsen, Telefon, WhatsApp).
+	Sender, Empfänger und Kanal sind hier Komponenten der physischen Schicht.
+
+	\paragraph{Informationsquelle}
+
+	Liefert Nachricht in Form einer Bitfolge in vorgegebenem Takt an den Sender.
+
+	\paragraph{Sender}
+
+	Wandelt Nachricht in Signal um und sendet dieses auf den Kanal.
+
+	\paragraph{Kanal}
+
+	Das Medium wird hier als (Übertragungs-)Kanal bezeichnet.
+	Eine \emph{Störquelle} kann das Signal beeinflussen.
+
+	\paragraph{Empfänger}
+
+	Rekonstruiert Nachricht aus dem Empfangssignal und übergibt sie der \emph{Informationssenke}.
+
+	\begin{figure}
+		\includegraphics[width=\textwidth]{images/03-shannon-telephone.png}
+		\caption{Abstraktes Modell nach Shannon am Beispiel der Telefonie}
+	\end{figure}
+
+	\subsection{Medium}
+
+	Das Medium (der Kanal) verbindet auf der physischen Schicht physisch benachbarte Geräte.
+	Die Distanz zwischen den Geräten muss überbrückbar sein.
+	Um die überbrückbare Distanz zu erhöhen, kommen sogenannte Repeater zum Einsatz, die das Signal verstärken.
+	Netze können verschiedenste Medien verwenden; beispielsweise WLAN, UMTS, Kupferkabel oder Glasfaser.
+
+	\subsection{Signal}
+
+	Mit einem Signal können Informationen übertragen werden.
+	Formal ist ein Signal eine Funktion $s : T \to V$.
+	Zum Zeitpunkt $t$ nimmt das Signal den (Signal-)Wert $s(t)$ ein.
+
+	Signale werden als zeit- und wert-kontinuierlich oder -diskret klassifiziert.
+	Diskret heißt hierbei salopp gesagt $T\text{ bzw. }V = \mathbb{Z}$; kontinuierlich heißt $T\text{ bzw. }V = \mathbb{R}$.
+
+	\begin{figure}
+		\includegraphics[width=\textwidth]{images/03-signal-classification.png}
+		\caption{Klassifizierung von Signalen}
+	\end{figure}
+
+	\subsubsection{Digitales Signal}
+
+	Ein digitales Signal ist sowohl zeit- als auch wert-diskret.
+
+	\paragraph{Isochrones digitales Signal}
+
+	Bei einem isochronen digitalen Signal erfolgen Wechsel des Signalwertes nur zum Schritttakt.
+
+	\subsubsection{Analoges Signal}
+
+	Ein analoges Signal ist sowohl zeit- als auch wert-kontinuierlich.
+
+	\paragraph{Periodische Signale}
+
+	Periodische Signale haben eine \emph{Periodendauer} $T$, d.h. der Signalwert wiederholte sich alle $T$ Zeiteinheiten:
+
+	\begin{equation*}
+		\forall n \in \mathbb{N} : s(t) = s(t + n \times T)
+	\end{equation*}
+
+	Die \emph{Frequenz} $f$ eines periodischen Signals ist definiert als $f = \frac{1}{T}$.
+
+	Merke (aus HM): eine periodische Funktion lässt sich als Summe von Sinus- und Kosinusfunktionen schrieben (Fourier-Reihe).
+
+	Wichtige Parameter der Sinus- und Kosinusfunktionen sind deren Amplitude, Frequenz und Phase.
+
+	\begin{figure}
+		\includegraphics[width=\textwidth]{images/03-trig.png}
+		\caption{Parameter trigonometrischer Funktionen}
+	\end{figure}
+
+	\subsection{Shannonsche Kanalkapazität}
+
+	\begin{align*}
+		C &= B \times \log_2\left(1 + \frac{S}{N}\right)\text{bit} \\
+		\frac{S}{N} &= 10 \times \log_{10}\frac{\text{\tiny Signalenergie}}{\text{\tiny Störenergie}}
+	\end{align*}
+
+	\begin{itemize}
+		\item $C$: Kanalkapazität in bit/s.
+		\item $B$: Bandbreite in Hz.
+		\item $\frac{S}{N}$: Verhältnis Signal- zu Störenergie.
+	\end{itemize}
+
+	Die Kanalkapazität beschreibt die maximale Datenrate, die aufgrund der gegebenen Randbedingungen über einen längeren Zeitraum hinweg aufrecht erhalten werden kann.
+
+	\paragraph{Beispiel:}
+
+	Gegeben sei die Bandbreite $B = 4\text{kHz}$ und das Verhältnis der Signal- zur Störenergie $30\text{dB} \Rightarrow \frac{S}{N} = 10^3$. Also:
+
+	\begin{equation*}
+		C = 4\text{kHz} \times \log_2\left(1 + 10^3\right)\text{bit} \approx 40\text{kbit/s}
+	\end{equation*}
+
+	\subsection{Modulation und Leitungscodierung}
+
+	Der Sender erhält von der Informationsquelle die Nachricht in Form einer Bitfolge und erzeugt daraus ein phyisisches Signal.
+	Innerhalb des Senders agieren der Leitungscodierer und der Modulator.
+
+	\paragraph{Leitungscodierer}
+
+	Der Leitungscodierer bereitet der Bitstrom für die Übertragung vor (bspw. fehlerkorrigierende Codes).
+
+	\paragraph{Modulator}
+
+	Der Modulator bildet aus der codierten Nachricht die physischen Signale.
+
+	\subsection{Modulation}
+
+	Durch Modulation (Veränderung) sinusförmiger Trägersignale wird ein zu übertragendes Nutzsignal für die physische Übertragung ausbereitet.
+	Ein zu sendendes digitales Signal wird zur Übertragung in ein analoges überführt.
+
+	\subsubsection{Amplitudenumtastung}
+
+	Hierbei wird die Amplitude des Trägersignals verändert.
+	In ihrer einfachsten Form besteht Amplitudenumtastung aus dem Ein- und Ausschalten (zur Übertragung einer 1 bzw. einer 0) des Trägersignals.
+
+	Amplitudenumtastung ist leicht zu implementieren, benötigt wenig Bandbreite, ist aber anfällig für Störungen.
+
+	\subsubsection{Frequenzumtastung}
+
+	Hierbei wird jedem möglichen Signalwert (bspw. 0 und 1) eine Frequenz zugewiesen.
+
+	Frequenzumtastung benötigt eine größere Bandbreite als Amplitudenumtastung.
+
+	\subsubsection{Phasenumtastung}
+
+	Bei Phasenumtastung wird jedem möglichen Signalwert eine bestimmten Phase der Sinusfunktion zugeordnet.
+
+	Phasenumtastung ist zwar komplex in der Umsetzung, jedoch relativ störungssicher.
+
+	\subsection{Leitungscodierung}
+
+	\subsubsection{Codierung}
+
+	Seien $A$ und $B$ endliche Alphabete.
+	Eine Codierung ist eine injektive Abbildung $c : A^+ \to B^+$.
+	Man nennt $A$ das \emph{Quellenalphabet} und $B$ das \emph{Codealphabet} von $c$.
+
+	\paragraph{Beispiel Morsecode}
+
+	\begin{align*}
+		A &= \{\text{A}, ..., \text{Z}, 0, ..., 9, \text{\emph{Punkt}}, \text{\emph{Komma}}, \text{?}\} \\
+		B &= \{\bullet-, ..., --\bullet\bullet, ...\} \\
+		\\
+		c(\text{A}) &= \bullet- \\
+		c(\text{Z}) &= --\bullet\bullet \\
+		c(\text{SAAAS}) &= \bullet\bullet\bullet\bullet-\bullet-\bullet-\bullet\bullet\bullet
+	\end{align*}
+
+	\paragraph{Code}
+
+	Sei $c$ eine Codierung.
+	Der von $c$ erzeugte Code ist die Menge
+
+	\begin{equation*}
+		C := c(A) = \{ c(z) : z \in A \}
+	\end{equation*}
+
+	$c(z) \in B$ nennt man das Codewort eines Zeichens $w \in A$.
+
+	\subsubsection{Mehrwertige Digitalsignale}
+
+	Ein binäres Digitalsignal ist zeit- und wert-diskret.
+	Es kann nur zwei Werte annehmen: 0 und 1.
+	Ein mehrwertiges Digitalsignal ist zeit- und wert-diskret und kann mehr als zwei Werte annehmen.
+	Beispielsweise kann ein quaternäres Signal 4 verschiedene Signalwerte annehmen und damit $\log_2{}4 = 2$ Bit pro Schrittdauer darstellen.
+
+	\subsubsection{Baudrate}
+
+	\paragraph{Übertragungsgeschwindigkeit}
+	
+	Die Übertragungsgeschwindigkeit (Datenrate) bezeichnet die Anzahl der übertragenen Bits in einer Schrittdauer in bit/s.
+
+	\paragraph{Schrittgeschwindigkeit}
+
+	Die Schrittgeschwindigkeit (Baudrate) bezeichent die Anzahl der Signalwertwechsel in einer Sekunde in baud ($=$ bit/s).
+
+	\begin{figure}
+		\includegraphics[width=\textwidth]{images/03-baudrate-datarate.png}
+		\caption{Baudrate und Datenrate}
+	\end{figure}
+
+	\subsection{Leitungscodes}
+
+	\subsubsection{NZR}
+
+	\subsubsection{Manchester}
+
+	\subsubsection{AMI}
+
+	\subsection{Störquellen}
+
+	\subsubsection{Dämpfung}
+
+	\subsubsection{Verzerrung}
+
+	\subsubsection{Rauschen}
 
 	\section{Sicherungsschicht}
 
