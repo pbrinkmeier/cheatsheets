@@ -550,7 +550,7 @@
 
 	\paragraph{Schrittgeschwindigkeit}
 
-	Die Schrittgeschwindigkeit (Baudrate) bezeichent die Anzahl der Signalwertwechsel in einer Sekunde in baud ($=$ bit/s).
+	Die Schrittgeschwindigkeit (Baudrate) bezeichnet die Anzahl der Signalwertwechsel innerhalb eines Schrittes in baud ($=$ bit/s).
 
 	\begin{figure}
 		\includegraphics[width=\textwidth]{images/03-baudrate-datarate.png}
@@ -559,19 +559,125 @@
 
 	\subsection{Leitungscodes}
 
-	\subsubsection{NZR}
+	Ziele von Leitungscodes sind:
+
+	\paragraph{Taktrückgewinnung}
+
+	Sender um Empfänger verfügen i.d.R. über keinen gemeinsamen Takt.
+	Der Empfänger sollte aus den Signalwerten den Takt rekonstruieren können.
+	Dies sollte unabhängig vom Inhalt der übertragenen Daten möglich sein.
+
+	\paragraph{Niedrige Baudrate}
+
+	Anzahl der Signalwertwechsel pro Schrittdauer gering halten.
+
+	\paragraph{Geringe Komplexität}
+
+	Kosten, Baugröße, Energieaufnahme, etc. sollten gering sein.
+
+	% TODO: Gleichstromzeug
+
+	\subsubsection{NRZ}
+
+	Bei NRZ (Non-Return to Zero) werden die Symbolwerte durch die Signalwerte bestimmt.
+	Eine 1 (0) in der Nachricht wird als hoher (niedriger) Pegel über ein gesamtes Taktintervall codiert.
+	Signalwertwechsel erfolgen an den Taktgrenzen; die Erkennung des Signals erfolgt direkt durch auslesen des Pegels.
+
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.6\textwidth]{images/03-nrz.png}
+		\end{center}
+		\caption{NRZ-Codierung des Wortes 010001}
+	\end{figure}
+
+	Die Baudrate ist bei NRZ recht niedrig (Signalwertwechsel nur bei 0-1- bzw. 1-0-Übergängen).
+	Taktrückgewinnung ist bei längeren 0- oder 1-Folgen jedoch nicht möglich.
 
 	\subsubsection{Manchester}
 
+	Der Manchester-Code ist ein sogenannter Biphasen-Code: Symbolwerte werden durch Phasensprünge bestimmt.
+	Eine 1 (0) in der Nachricht wird als Signalübergang vom hohen Pegel zum niedrigen Pegel (vom niedrigen zum hohen Pegel) in der Intervallmitte codiert.
+	Bei 0-Folgen oder 1-Folgen müssen also \enquote{Hilfswechsel} eingefügt werden, um mehrfache Phasensprünge in derselben Richtung zu ermöglichen.
+
+	\begin{figure}
+		\includegraphics[width=\textwidth]{images/03-manchester.png}
+		\caption{Manchester-Codierung des Wortes 1010011100}
+	\end{figure}
+
+	Taktrückgewinnung lässt sich beim Manchester-Code recht einfach umsetzen, da mindestens ein Signalwertwechsel pro Taktintervall auftritt.
+	Die Baudrate ist jedoch sehr hoch; bei 0-Folgen oder 1-Folgen ist sie doppelt so hoch wie die Datenrate.
+	Die Implementierung des Manchester-Codes ist einfach; er ist die XNOR-Verknüpfung der Daten und des Taktes.
+
 	\subsubsection{AMI}
+
+	AMI (Alternate Mark Inversion) nutzt einen ternären Code mit den möglichen Werten -1, 0 und 1.
+	Eine 0 in der Nachricht wird als 0 über ein gesamtes Taktintervall codiert.
+	Eine 1 wird abwechselnd als -1 und 1 über ein gesamtes Taktintervall codiert.
+
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.6\textwidth]{images/03-ami.png}
+		\end{center}
+		\caption{AMI-Codierung des Wortes 0100011}
+	\end{figure}
+
+	Taktrückgewinnung ist bei AMI bei langen 0-Folgen nicht möglich.
+	Die Baudrate ist bei AMI einigermaßen niedrig (Signalwertwechsel an 0-1, 1-0 und 1-1-Übergängen aber nicht bei 0-0).
 
 	\subsection{Störquellen}
 
+	Wie bereits erwähnt kann eine Störquelle das Signal auf einem Kanal beeinflussen.
+	Wichtige Beeinträchtigungen sind:
+
+	\begin{itemize}
+		\item \emph{Dämpfung} (Attenuation)
+		\item \emph{Verzögerung} (Delay Distortion)
+		\item \emph{Rauschen} (Noise)
+	\end{itemize}
+
 	\subsubsection{Dämpfung}
+
+	Die Stärke eines Signales sinkt mit zunehmender Distanz.
+	Beschrieben in dB/m.
+	Beim Empfänger muss die Signalstärke noch groß genug sein, um das Signal überhaupt zu erkennen und größer als das Rauschen.
+	Dafür können Verstärker oder Repeater eingsetzt werden.
 
 	\subsubsection{Verzerrung}
 
+	Durch die Verzögerung der Signalausbreitung entsteht Verzögerungsverzerrung.
+	Diese variiert mit der Frequenz.
+	Da unterschiedliche Frequenzen den Empfänger zu verschiedenen Zeiten erreichen können, kann es zu Phasenverschiebung zwischen den Frequenzen.
+	Aufeinanderfolgende Bits können dadurch überlappen.
+	Dies nennt man \emph{Intersymbol-Interferenz}.
+
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.6\textwidth]{images/03-intersymbol-interference.png}
+		\end{center}
+		\caption{Verzögerungsverzerrung (Intersymbol-Interferenz)}
+	\end{figure}
+
 	\subsubsection{Rauschen}
+
+	\paragraph{Thermisches Rauschen}
+
+	Thermisches Rauschen ist eine Funktion der Temperatur.
+	Es ist gleich verteilt über Frequenzen hinweg (\enquote{weißes Rauschen}) und kann nicht eliminiert werden.
+	Es bestimmt damit die maximales Leistungsfähigkeit.
+
+	\paragraph{Modulationsrauschen}
+
+	Zwei Frequenzen überlagern sich.
+
+	\paragraph{Impulsrauschen}
+
+	Impulsrauschen wird hervorgerufen von elektromagnetischen Störungen wie bspw. Blitzen.
+	Es macht sich bemerkbar durch unregelmäßige Ausschläge und Geräuschspitzen kurzer Dauer und hoher Amplitude.
+
+	\begin{figure}
+		\includegraphics[width=\textwidth]{images/03-error.png}
+		\caption{Auswirkung von Störungen}
+	\end{figure}
 
 	\section{Sicherungsschicht}
 
