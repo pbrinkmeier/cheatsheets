@@ -1,11 +1,19 @@
-\documentclass[a4paper]{article}
+\documentclass[a4paper, 14pt]{article}
 
+\usepackage[margin=3cm]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[ngerman]{babel}
 \usepackage[autostyle=true,german=quotes]{csquotes}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{multirow}
+\usepackage{array}
+\usetikzlibrary{
+	calc
+}
 
 \author{Paul Brinkmeier}
 \title{Cheatsheet für Einführung in Rechnernetze}
@@ -15,6 +23,8 @@
 	\newpage
 	\tableofcontents
 	\newpage
+
+	\raggedright
 
 	\section{Grundlegende Grundlagen}
 
@@ -117,6 +127,8 @@
 
 	Ein abstraktes Medium trifft keinerlei Aussage über seine konkrete (physische) Umsetzung.
 
+	\subsubsection{Dienstesicht}
+
 	\paragraph{Dienstesicht}
 
 	Betrachtung eines Rechnernetzes als Black-Box.
@@ -182,6 +194,175 @@
 		\item Es werden keine Duplikate empfangen.
 		\item Es werden keine Phantom-Daten empfangen.
 	\end{itemize}
+
+	\textbf{Merke}: Zuverlässiger Dienst (ZD) $\neq$ Bestätigter Dienst (BD).
+	Es gilt eher BD $\subset$ ZD.
+	Bestätigungen sind nur \enquote{ein Baustein} zuverlässiger Dienste.
+
+	\subsection{Schichten}
+
+	\paragraph{Schicht}
+
+	Eine Schicht bündelt zusammengehörige Funktionalitäten, die sich von denen anderer Schichten unterscheiden.
+	Schichten sind hierarchisch angeordnet.
+	An ihrer Schnittstelle stellt eine Schicht Dienste für die nächst-\enquote{höhere} Schicht bereit und nutzt Dienste der nächst-\enquote{unteren} Schicht.
+	Die technische Umsetzung einer Schicht ist an dieser Schnittstelle nicht sichtbar.
+	Zur Erbringung ihrere Dienste nutzt eine Schicht die Dienste der darunter liegenden Schicht.
+
+	Protokolle sind innerhalb einer Schicht lokalisiert.
+
+	\begin{figure}
+		\includegraphics[width=\textwidth]{images/02-layers.png}
+		\caption{Protokolle, Dienste, Schichten}
+	\end{figure}
+
+	\paragraph{Horizontale Kommunikation}
+
+	Horizontale Kommunikation findet innerhalb einer Schicht zwischen Sender und Empfänger statt.
+	Die Protokollinstanzen der Schicht (auf den jeweiligen Geräten) tauschen Daten untereinander aus, um den geforderten Dienst zu erbringen.
+
+	\paragraph{Vertikale Kommunikation}
+
+	Vertikale Kommunikation findet zwischen zwei Schichten innerhalb eines Gerätes statt.
+	Protokollinstanz der Schicht $N$ nimmt Dienste der Schicht $N - 1$ in Anspruch oder reichen Daten an Schicht $N + 1$ weiter.
+
+	\subsubsection{Fünf-Schichten-Referenzmodell}
+
+	\begin{figure}
+		\begin{center}
+			\input{figures/02-five-layers.tex}
+		\end{center}
+		\caption{Referenzmodell mit fünf Schichten}
+	\end{figure}
+
+	\paragraph{Physische Schicht}
+
+	Zwei direkt über ein Übertragungsmedium beschränkter Länge verbundene Geräte können unstrukturierte Bitfolgen austauschen.
+	Eigenschaften dieser Schicht sind:
+
+	\begin{itemize}
+		\item Stellt unzuverlässigen Dienst für (Sicherungsschicht) bereit.
+		\item Bits werden nicht gepuffert.
+		\item Stark Hardwareabhängig (\enquote{LAN-Kabel}, Glasfaser, WLAN, etc.).
+		\item Bei der Übertragung können Störungen auftreten (Paradebeispiel: WLAN).
+	\end{itemize}
+
+	\paragraph{Sicherungsschicht}
+
+	Auf dieser Schicht werden zwischen physisch benachbarten Systemen Daten Paketweise (sog. \emph{Rahmen}) übertragen.
+	Eigenschaften dieser Schicht sind:
+
+	\begin{itemize}
+		\item Ermöglicht Adressierung benachbarter Geräte.
+		\item Stellt unzuverlässige und zuverlässige Dienste (Erkennung von Fehlern der physischen Schicht) bereit.
+		\item Puffert Daten sowohl beim Sender als auch beim Empfänger.
+		\item Abstrahiert physisches Medium.
+	\end{itemize}
+
+	\paragraph{Vermittlungsschicht}
+
+	Diese Schicht ermöglicht den Austausch von Daten zwischen (nicht unbedingt) benachbarten Systemen über Zwischensysteme (\emph{Ende-zu-Ende}).
+	Pakete nennt man hier typischerweise \emph{Datagramme}.
+	Eigenschaften dieser Schicht sind:
+
+	\begin{itemize}
+		\item Universale Adressierung von Endsystemen (bspw. IP-Adressen).
+		\item Stellt unzuverlässige und zuverlässige Dienste bereit.
+		\item Datagramme können in Zwischensystemen gepuffert werden.
+		\item Ein Datagramm wird in einem oder mehreren Rahmen der Sicherungsschicht übertragen.
+	\end{itemize}
+
+	\paragraph{Transportschicht}
+
+	In dieser Schicht ist die Kommunikation zwischen Anwendungsprozessen auf den Endsystemen gekapselt (\emph{Nutzer-zu-Nutzer}).
+	Pakete nennt man hier typischerweise \emph{Datagramme} oder \emph{Segmente}.
+	Eigenschaften dieser Schicht sind:
+
+	\begin{itemize}
+		\item Adressierung von Anwendungsprozessen auf Endsystemen (\emph{Ports}).
+		\item Stellt unzuverlässige (bspw. UDP) und zuverlässige (bspw. TCP) Dienste bereit.
+		\item Segmente/Datagramme werden in Endsystemen gepuffert.
+		\item Ein Segment/Datagramm wird in einem oder mehreren Datagrammen der Vermittlungsschicht übertragen.
+	\end{itemize}
+
+	\paragraph{Anwendungsschicht}
+
+	Über diese Schicht tauschen Anwendungen untereinander \emph{Nachrichten} (bspw. HTTP-Response) aus.
+	Je nach Anwendung werden hier zuverlässige oder unzuverlässige Dienste der Transportschicht genutzt.
+
+	\subsubsection{TCP/IP-Referenzmodell}
+
+	Im Internet am weitesten verbreitet (quasi alleinstehend) ist das TCP/IP-Modell.
+	Dieses definiert in \href{https://tools.ietf.org/html/rfc1122}{RFC 1122} vier Schichten:
+
+	\begin{center}
+		\Large
+		\begin{tabular}{| c |}
+			\hline
+			Anwendungsschicht \\
+			\hline
+			Transportschicht \\
+			\hline
+			Internetschicht \\
+			\hline
+			Netzzugang \\
+			\hline
+		\end{tabular}
+	\end{center}
+
+	Die Internetschicht entspricht der Vermittlungsschicht; Netzzugang kombiniert phyisische und Sicherungsschicht.
+	
+	\subsubsection{OSI-Referenzmodell}
+
+	Das von der ISO standardisierte OSI-Modell (Open Systems Interconnection Model) definiert sieben Schichten:
+
+	\begin{center}
+		\Large
+		\begin{tabular}{| c | c}
+			\cline{1-1}
+			Anwendungsschicht & \multirow{3}{*}{\normalsize Anwendungsorientierte Schichten} \\
+			\cline{1-1}
+			Darstellungsschicht & \\
+			\cline{1-1}
+			Sitzungsschicht & \\
+			\hline
+			Transportschicht & \multirow{4}{*}{\normalsize Transportorientierte Schichten} \\
+			\cline{1-1}
+			Vermittlungsschicht & \\
+			\cline{1-1}
+			Sicherungsschicht & \\
+			\cline{1-1}
+			Physische Schicht & \\
+			\cline{1-1}
+		\end{tabular}
+	\end{center}
+
+	\paragraph{Transportorientierte Schichten}
+
+	Transportorientierte Schichten befassen sich mit der Übertragung von Daten zwischen Anwendungen.
+	Die Semantik der übertragenen Daten spielt dabei keine Rolle.
+
+	\paragraph{Anwendungsorientierte Schichten}
+
+	Hier werden Anwendungsbezogene Protokolle abgewickelt.
+	Die Semantik der übertragenen Daten ist wichtig.
+
+	\begin{itemize}
+		\item \emph{Sitzungsschicht} --- Bietet Nichtunterbrechbarkeit von Kommunikationsbeziehungen.
+		\item \emph{Darstellungsschicht} --- Vereinheitlicht Darstellung der Daten über heterogene Systeme hinweg (bspw. Litte- vs. Big-Endian).
+		\item \emph{Anwendungsschicht} --- Austausch von anwendungsspezifischen Daten.
+	\end{itemize}
+
+	\subsubsection{TCP/IP vs. OSI}
+
+	\begin{itemize}
+		\item Netzzugang $\Leftrightarrow$ OSI-Schichten 1 und 2 (physische Schicht, Sicherungsschicht).
+		\item Schichten 3 und 4 (Vermittlungsschicht, Transportschicht) sind identisch.
+		\item Anwendungsschicht $\Leftrightarrow$ OSI-Schichten 5 bis 7 (Sitzungs-, Darstellungs- und Anwendungsschicht).
+	\end{itemize}
+
+	Beim TCP/IP-Referenzmodell wird weniger granular zwischen den Schichten unterschieden.
+	Das liegt daran, dass dieses Modell sich eher mit der Zeit aus Prototypen entwickelt hat, als dass es entworfen worden wäre.
 
 	\section{Physische Schicht}
 

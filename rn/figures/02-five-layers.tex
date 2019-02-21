@@ -1,0 +1,25 @@
+\begin{tikzpicture}[
+	>=latex
+]
+	\node(layers)[inner sep=0]{\Large \begin{tabular}{| c |}
+		\hline
+		Anwendungsschicht \\
+		\hline
+		Transportschicht \\
+		\hline
+		Vermittlungsschicht \\
+		\hline
+		Sicherungsschicht \\
+		\hline
+		Physische Schicht \\
+		\hline
+	\end{tabular}};
+
+	\coordinate (T) at ($(layers.north east) + (1cm, 0)$);
+	\coordinate (B) at ($(layers.south east) + (1cm, 0)$);
+
+	\draw[->] (B) -- (T);
+
+	\node[anchor=west] at (T) {Abstraktion hoch};
+	\node[anchor=west] at (B) {Abstraktion niedrig};
+\end{tikzpicture}
