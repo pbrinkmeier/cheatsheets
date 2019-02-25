@@ -241,7 +241,7 @@
 	Eigenschaften dieser Schicht sind:
 
 	\begin{itemize}
-		\item Stellt unzuverlässigen Dienst für (Sicherungsschicht) bereit.
+		\item Stellt unzuverlässigen Dienst (für die Sicherungsschicht) bereit.
 		\item Bits werden nicht gepuffert.
 		\item Stark Hardwareabhängig (\enquote{LAN-Kabel}, Glasfaser, WLAN, etc.).
 		\item Bei der Übertragung können Störungen auftreten (Paradebeispiel: WLAN).
@@ -367,6 +367,7 @@
 	\section{Physische Schicht}
 
 	\subsection{Abstraktes Modell nach Shannon}
+	\label{sec:shannon}
 
 	Allgemeine Erkenntnisse, die für alle Arten der Datenübertragung gelten (bspw. Morsen, Telefon, WhatsApp).
 	Sender, Empfänger und Kanal sind hier Komponenten der physischen Schicht.
@@ -680,6 +681,254 @@
 	\end{figure}
 
 	\section{Sicherungsschicht}
+
+	Die Sicherungsschicht basiert auf den Diensten der physischen Schicht.
+	Diese stellen unzuverlässige Übertragung von Bitfolgen bereit; es ist also nicht garantiert, dass Bits fehlerfrei übertragen werden.
+
+	Die Sicherungsschicht bietet:
+
+	\begin{itemize}
+		\item Dienste zur zuverlässigen und unzuverlässigen Übertragung; zur Bereitstellung zuverlässiger Dienste sind Erkennung und Behebung von Fehlern der physischen Schicht erforderlich.
+		\item Adressierung benachbarter Geräte; an einem physischen Medium können mehrere Geräte angeschlossen sein (bspw. Bus).
+		\item Pufferung von Daten sowohl im sendenden als auch im empfangenden Gerät.
+		\item Abstraktion vom physischen Medium.
+	\end{itemize}
+
+	\subsection{Grundlegendes Szenario}
+
+	\subsubsection{Broadcast- vs. Punkt-zu-Punkt-Link}
+
+	\paragraph{Broadcast-Link}
+
+	Alle an ein Broadcast-Medium angeschlossenen Geräte empfangen auf diesem Medium übertragene Rahmen.
+
+	\paragraph{Punkt-zu-Punkt-Link}
+
+	Zwei Geräte sind über einen dedizierten Link verbunden.
+
+	\subsubsection{Punkt-zu-Punkt-Link}
+
+	An einem Punkt-zu-Punkt-Link sind die Kommunikationsformen Simplex, Duplex und Halbduplex möglich.
+
+	\paragraph{Simplex}
+
+	Übertragung nur in eine Richtung.
+
+	\paragraph{Duplex}
+
+	Zeitgleiche Übertragung in beide Richtungen (auch \emph{Vollduplex}).
+
+	\paragraph{Halbduplex}
+
+	Abwechselnde Übertragung in beide Richtungen.
+
+	\subsubsection{Annahmen}
+
+	In diesem Kapitel gehen wir von folgendem Szenario aus:
+	Zwei Geräte $A$ und $B$ sind direkt über ein physisches Medium miteinander verbunden.
+	Das verwendete Medium ist ein Vollduplex-Punkt-zu-Punkt-Link.
+
+	\subsection{Bitfehler}
+
+	Während der Übertragung einer Bitfolge kann es zur Verfälschung von Bits kommen.
+	Fehlerursachung können beispielsweise Störungen auf der physischen Schicht sein.
+
+	\paragraph{Einzelbitfehler}
+
+	Ein einzelnes Bit ist fehlerhaft.
+
+	\paragraph{Bündelfehler}
+
+	Mehrere direkt aufeinanderfolgende Bits sind fehlerhaft.
+
+	\subsubsection{Bitfehlerrate}
+
+	Die Bitfehlerrate ist ein Maß für die Fehlerhäufigkeit.
+	Sie wird durch das Verhältnis gestörter Bits zu übertragenen Bits berechnet:
+
+	\begin{equation*}
+		\text{Bitfehlerrate} = \frac{\sum \text{gestörte Bits}}{\sum \text{übertragene Bits}}
+	\end{equation*}
+
+	Typische Werte für die Bitfehlerrate sind:
+
+	\begin{itemize}
+		\item Analoges Fernsprechnetz: $2 \times 10^{-4}$ $\approx$ $0,02\%$
+		\item Funkstrecke: $10^{-3}$ bis $10^{-4}$ $\approx$ $0,1\%$ bis $0,01\%$
+		\item Ethernet: $10^{-9}$ bis $10^{-10}$ $\approx$ $0,0000001\%$ bis $0,00000001\%$
+		\item Glasfaser: $10^{-10}$ bis $10^{-12}$ $\approx$ $0,00000001\%$ bis $0,0000000001\%$
+	\end{itemize}
+
+	% TODO: Fehlerauswirkungen (?)
+
+	\subsection{Paketfehler}
+
+	Es gibt vier Arten von Paketfehlern:
+
+	\paragraph{Verlust eines Pakets}
+
+	Das Paket wird erfolgreich versendet, kommt aber nicht beim Empfänger an.
+	Grund dafür können Störungen des Mediums sein.
+
+	\paragraph{Duplizierung eines eines Pakets}
+
+	Das Paket wird einmal versendet, kommt aber mehrmals beim Empfänger an.
+	Grund dafür können Störungen des Mediums sein.
+
+	\paragraph{Empfang eines Phantom-Pakets}
+
+	Das Paket kommt beim Empfänger an, wurde aber nicht vom (korrekten) Sender versendet.
+	Gründe dafür können verfrühte Sendewiederholung des Senders oder falsche Zustellung sein.
+
+	\paragraph{Reihenfolgevertauschung}
+
+	Zwei oder mehr Pakete kommen in einer anderen Reihenfolge beim Empfänger an, als in der, in der sie versendet worden sind.
+	Ein Grund dafür kann sein, dass die Pakete verschiedene Wege durch das Weg nehmen.
+
+	\subsection{Kanalcodierung}
+
+	Im \hyperref[sec:shannon]{abstrakten Modell nach Shannon} sitzt der \emph{Kanalcodierer} zwischen Informationsquelle und Sender.
+	Er schützt Daten durch Hinzufügen von Redundanz gegen Übertragungsfehler.
+
+	\subsubsection{Redundanz}
+
+	Redundanz wird in Rechnernetzen auf verschiedene Weisen genutzt.
+
+	\paragraph{Fehlererkennung}
+
+	Durch Hinzufügen von Redundanz wird der Unterschied zwischen Codewörtern erhöht.
+	Ein Beispiel aus der Realität ist das NATO-Alphabet.
+	Da bspw. T und D über Funk schwer zu unterscheiden sind, sagt man \enquote{Tango} und \enquote{Delta}.
+	Einen Fehlererkennungscode nennt man auch \emph{Error Detecting Code} (EDC).
+
+	\paragraph{Fehlerkorrektur}
+
+	Werden Fehler erkannt, können mittels der hinzugefügten Redundanz korrigiert werden.
+	Dies nennt man auch \emph{Forward Error Correction} (FEC).
+
+	\paragraph{Wiederholungsaufforderung}
+
+	Der Empfänger teilt dem Sender das Ergebnis der Fehlerkorrektur mit.
+	Der Sender wiederholt gegebenenfalls die Übertragung der Daten.
+	Dies nennt man \emph{Automatic Repeat Request} (ARQ).
+
+	\subsubsection{Fehlererkennender, -korrigierender Code}
+
+	\paragraph{Fehlererkennender Code}
+
+	Ein Code ist $r$-fehlererkennend, wenn der Empfänger jedes Codewort, in dem bis zu $r$ Symbole verfälscht wurden, als fehlerhaft identifizieren kann.
+
+	\paragraph{Fehlerkorrigierender Code}
+
+	Ein Code ist $r$-fehlerkorrigierend, wenn der Empfänger jedes Codewort, in dem bis zu $r$ Symbole verfälscht wurden, wiederherstellen kann.
+
+	% TODO: Hamming-Abstand, Code-Abstand, Hamming-Kugel
+
+	\subsection{Erkennung von Bitfehlern}
+
+	Im folgenden gelte:
+
+	\begin{align*}
+		\text{Nutzdaten: } x &= x_1 \cdot x_2 \cdot ... \cdot x_k
+	\end{align*}
+
+	\subsubsection{Einfache Paritätsprüfung}
+
+	\begin{align*}
+		\text{Paritätsbit: } p &= x_1 \oplus x_2 \oplus ... \oplus x_k \\
+		\text{Codewort: } z &= x \cdot p
+	\end{align*}
+
+	Beispielsweise wird das Wort $x = 1010$ codiert als $z = 10100$.
+	Der Empfänger erhält $z* = 11100$ mit einem Bitfehler an der zweiten Stelle.
+	Er erkennt den Fehler, da das Paritätsbit von $z*$ $p* = 1$ nicht mit dem ursprünglichen Paritätsbit $p = 0$ übereinstimmt.
+
+	Einfache Paritätsprüfung erkennt nur einzelne Bitfehler.
+
+	\subsubsection{Hamming-Code}
+
+	An denjenigen Stellen, die Zweierpotenzen sind, stehen im Codewort Paritätsbits.
+	Die restlichen Stellen werden mit den Nutzdaten aufgefüllt.
+
+	\begin{align*}
+		\text{Nutzdaten: } x &= 1000, k = 4 \\
+		\text{Codewort: } z &= p_1 \cdot p_2 \cdot x_1 \cdot p_3 \cdot x_2 \cdot x_3 \cdot x_4 = p_1 \cdot p_2 \cdot 1 \cdot p_3 \cdot 0 \cdot 0 \cdot 0 \\
+		\text{Paritätsbits: } p_k &= \bigoplus_{e \in E_k} e, E_k = \{ z_i : i \neq 2^{k-1} \wedge i = 2^{k-1} + j \times 2^{k} + l, j \in \mathbb{N}_0, l \in [0; 2^k) \subseteq \mathbb{N}_0 \} \\
+		p_1 &= z_3 \oplus z_5 \oplus z_7 = x_1 \oplus x_2 \oplus x_4 = 1 \\
+		p_2 &= z_3 \oplus z_6 \oplus z_7 = x_1 \oplus x_3 \oplus x_4 = 1 \\
+		p_3 &= z_5 \oplus z_7 \oplus z_8 = x_2 \oplus x_3 \oplus x_4 = 0 \\
+		\Rightarrow z &= 1110000
+	\end{align*}
+
+	Das Paritätsbit $p_k$ berechnet sich aus der XOR-Verknüpfung einiger Stellen des Codeworts.
+	Dazu gehören die $2^{k-1} - 1$ nachfolgenden Stellen; dann werden $2^{k-1}$ Stellen übersprungen, die nächsten $2^{k-1}$ Stellen gezählt, $2^{k-1}$ Stellen übersprungen etc.
+	Im obigen Beispiel folgen auf $p_1$ bspw. $2^0 - 1 = 0$ Bits, dann wird eine ($2^{k-1} = 1$) Stelle übersprungen ($z_2$), eine Stelle gezählt ($z_3$), eine Stelle übersprungen ($z_4$) und auf gleiche Weise werden noch die Stellen $z_5$ und $z_7$ gezählt.
+	Diese Stellen des Codeworts entsprechen den Stellen $x_1$, $x_2$ und $x_4$ der Nutzdaten.
+	Das Paritätsbit $p_1$ ist also $1 \oplus 0 \oplus 0 = 1$.
+
+	\paragraph{Korrektur von Bitfehlern}
+	
+	Der Hamming-Code kann Bitfehler korrigieren.
+	Um die Position eines Bitfehlers zu finden, berechnet der Empfänger aus $z^*$ (dem womöglich verfälschten Codewort) die Paritätsbits von $x^*$.
+	Die XOR-Verknüpfung dieser berechneten Paritätsbits $q^*$ mit den empfangenen Paritätsbits $p^*$ liefert die Position des Bitfehlers.
+
+	Sei beispielsweise das gesendete Codewort $z = 1110000$ und das empfangene Codewort $z^* = 1110010$.
+	Es ist also ein Bitfehler an der 6. Position aufgetreten.
+	Dann gilt:
+
+	\begin{align*}
+		z^* &= z^*_1 \cdot ... \cdot z^*_7 = p^*_1 \cdot p^*_2 \cdot x^*_1 \cdot p^*_3 \cdot x^*_2 \cdot x^*_3 \cdot x^*_4 \\
+		x^* &= x^*_1 \cdot ... \cdot x^*_4 = 1010 \\
+		q^*_1 &= x^*_1 \oplus x^*_2 \oplus x^*_4 = 1 \\
+		q^*_2 &= x^*_1 \oplus x^*_3 \oplus x^*_4 = 0 \\
+		q^*_3 &= x^*_2 \oplus x^*_3 \oplus x^*_4 = 1 \\
+		\Rightarrow q^* &= q^*_3 \cdot q^*_2 \cdot q^*_1 = 101 \\
+		p^* &= p^*_3 \cdot p^*_2 \cdot p^*_1 = 011 \\
+		q^* \oplus p^* &= 110_2 = 6_{10}
+	\end{align*}
+
+	Ist die XOR-Verknüpfung von $q^*$ und $p^*$ Null, wurde das Codewort fehlerfrei übertragen.
+
+	\subsubsection{Cyclic Redundancy Check}
+
+	% TODO
+
+	\subsection{Vorwärtsfehlerkorrektur}
+
+	Vorwärtsfehlerkorrektur (FEC) setzt neben fehlerkorrigierenden Codes zusätzlich redundante Pakete/Rahmen ein, um es dem Empfänger zu ermöglichen, Paketfehler zu korrigieren ohne Sendewiederholungen anfordern zu müssen.
+	Dies reduziert im Allgemeinen die Verzögerung bis Daten beim Dienstnutzer abgeliefert werden können.
+	Andererseits werden die redundanten Pakete unabhängig davon gesendet, ob ein tatsächlich ein Fehler auftritt.
+	Dadurch sinkt die für Nutzdaten einsetzbare Bandbreite.
+
+	Seien beispielsweise die Pakete $D_1 = 0101$, $D_2 = 1111$ und $D_3 = 0000$ zu senden.
+	Durch den Einsatz fehlererkennender Codes ist es dem Empfänger möglich, zu entscheiden, ob ein erhaltenes Paket fehlerbehaftet ist.
+	Über die XOR-Verknüpfung berechnet der Sender nun ein zusätzliches Paket $K = D_1 \oplus D_2 \oplus D_3 = 1010$.
+	Der Empfänger muss nur drei dieser vier Pakete korrekt empfangen.
+
+	Wird bspw. Paket $D_1$ nicht empfangen, kann der Empfänger dieses aus der XOR-Verknüpfung der restlichen (korrekt empfangenen) Pakete $D_1 = K \oplus D_2 \oplus D_3$ rekonstruieren; dasselbe gilt für $D_2$ und $D_3$.
+	Fehlt $K$, so sind die restlichen Pakete korrekt übertragen worden.
+
+	Fehlt mehr als ein Paket, so muss eine Sendewiederholung beantragt werden.
+
+	\subsection{ARQ-Verfahren}
+
+	\subsubsection{Stop-and-Wait}
+
+	\subsubsection{Alternating Bit Protocol}
+
+	\subsubsection{Go-Back-N}
+
+	\subsubsection{Selective Repeat}
+
+	\subsubsection{Selective Reject}
+
+	\subsection{Flusskontrolle}
+
+	\subsubsection{Halt-und-Weiter}
+
+	\subsubsection{Kreditbasierte Flusskontrolle}
+
+	\subsection{Verbindungen}
 
 	\section{Vermittlungsschicht}
 
