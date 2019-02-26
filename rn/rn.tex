@@ -11,6 +11,8 @@
 \usepackage{tikz}
 \usepackage{multirow}
 \usepackage{array}
+% TODO: use \SI everywhere
+\usepackage[binary-units=true, per-mode=symbol]{siunitx}
 \usetikzlibrary{
 	calc
 }
@@ -912,15 +914,188 @@
 
 	\subsection{ARQ-Verfahren}
 
+	Unter ARQ (Automatic Repeat Request) werden Verfahren zur Sendewiederholung bei Paketfehlern zusammengefasst.
+	Verfahren unterscheiden sich beispielsweise in der Art der verwendeten Quittungen, wann Quittungen versendet und Sendewiederholungen veranlasst werden oder wieviele Daten der Sender versenden darf, ohne eine Quittung erhalten zu haben.
+
+	\subsubsection{Leistungsbewertung}
+
+	Zur Bewertung von ARQ- und im allgemeinen Übertragungsverfahren gibt es verschiedene Kriterien.
+
+	\paragraph{Durchsatz/Datenrate}
+
+	Die Datenrate (\emph{Throughput}) $r$ ist ein Maß für die Menge an Daten, die pro Zeiteinheit übertragen werden können.
+	Sie wird in bit/s angegeben.
+
+	\paragraph{Sendezeit}
+
+	Die Sendezeit (\emph{Transmission Delay}) ist die Zeit, die nötig ist um $n$ Bits zu senden.
+	Sie ist abhängig von der Datenrate.
+
+	\paragraph{Ausbreitungsverzögerung}
+
+	Die Ausbreitungsverzögerung (\emph{Propagation Delay}) $t_a$ ist die Zeit, die ein Bit von A nach B benötigt.
+	Anders gesagt erfasst sie die Zeitspanne zwischen Absenden eines Signals und dessen Eintreffen am anderen Ende des Mediums.
+	Sie ist abhängig von der \enquote{Länge} des Medium un der Ausbreitungsgeschwindigkeit.
+
+	\begin{equation*}
+		t_a = \frac{d}{v}
+	\end{equation*}
+
+	Hier bezeichnet $d$ die Länge des Mediums in m, $v$ die Ausbreitungsgeschwindigkeit in m/s und $t_a$ die Ausbreitungsverzögerung in $s$.
+	In üblichen Medien ist die Ausbreitungsgeschwindigkeit $v$ etwa zwei Drittel der Lichtgeschwindigkeit.
+
+	Beispielsweise wäre für ein Medium der Länge $d = 500 \text{km}$ mit der Ausbreitungsgeschwindigkeit $v = 200000 \text{km/s}$ Ausbreitungsverzögerung $t_a = \frac{500 \text{km}}{200000 \text{km/s}} = 2,5 \text{ms}$.
+
+	\paragraph{Sendezeit}
+
+	Die Sendezeit $t_s$ ist die für den Sendevorgang beim Sender erforderliche Zeit.
+
+	\begin{equation*}
+		t_s = \frac{X}{r}
+	\end{equation*}
+
+	Hier bezeichnet $X$ die zu sendende Datenmenge in bit, $r$ die zur Verfügung stehende Datenrate in bit/s und $t_s$ die Sendezeit in $s$.
+
+	\paragraph{Auslastung}
+
+	Die Auslastung (\emph{Utilization}) $U$ ist ein Maß für die Nutzung einer Ressource (z.B. Übertragungsmedium).
+	Sie beschreibt das Verhältnis der tatsächlichen Nutzung zur möglichen Nutzung der Ressource.
+
+	\begin{equation*}
+		U = \frac{t_s}{t_{Ges}}
+	\end{equation*}
+
+	\paragraph{Parameter $a$}
+
+	Der Paramter $a$ ist definiert als:
+
+	\begin{equation*}
+		a = \frac{t_a}{t_s}
+	\end{equation*}
+
+	Er repräsentiert das Verhältnis der Länge des Mediums in Bit zur Länge eines Pakets.
+
+	\paragraph{Bandbreiten-Verzögerungs-Produkt}
+
+	\begin{itemize}
+		\item Bandbreite $\times$ Verzögerung
+		\item Bandbreite $\times$ RTT/2
+	\end{itemize}
+
+	\begin{equation*}
+		\text{BVP} = t_a \times r = \frac{d}{v}r
+	\end{equation*}
+
+	Hier bezeichnet $d$ die Länge des Mediums in \si{\meter}, $v$ die Ausbreitungsgeschwindigkeit in \si{\meter\per\second} und $r$ die Datenrate in \si{\bit\per\second}.
+
+	Seien beispielweise für eine WLAN-Verbindung die Datenrate/Bandbreite $r = \text{\SI{54}{\mega\bit\per\second}}$, die Entfernung $d = \text{\SI{50}{\meter}}$ und die Round-Trip-Time $\text{RTT} = \text{\SI{0,33}{\micro\second}}$.
+	Das Bandbreiten-Verzögerungs-Produkt wäre dementsprechend:
+
+	\begin{align*}
+		\text{BVP} = t_a \times r = \frac{\text{RTT}}{2} \times r &= \frac{\text{\SI{0,33}{\micro\second}}}{2} \times \text{\SI{54}{\mega\bit\per\second}} \\
+		&\approx \text{\SI{9}{\bit}}
+	\end{align*}
+
+	\paragraph{Weitere Kriterien}
+
+	Die Kriterien Verarbeitungsverzögerung (\emph{Processing Delay}) $t_V$ und Warteschlagenverzögerung (\emph{Queuing Delay}) $t_Q$ sollen hier zwar genannt sein, werden im Folgenden aber vernachlässigt.
+
 	\subsubsection{Stop-and-Wait}
+
+	Stop-and-Wait ist ein sehr einfaches ARQ-Verfahren.
+	Der Sender sendet ein Paket und wartet auf eine Quittung des Empfängers.
+	Erst wenn die Quittung beim Sender angekommen ist, wird das nächste Paket gesendet.
+	Empfängt der Sender nach einer bestimmten Wartezeit keine Quittung, sendet er das Paket erneut.
+	Stop-and-Wait wird beispielsweise bei WLAN eingesetzt.
+
+	Bei diesem Verfahren stellt sich üblicherweise die Frage, nach welcher Wartezeit eine Sendewiederholung erfolgen soll.
 
 	\subsubsection{Alternating Bit Protocol}
 
+	Durch irrtümliche Sendewiederholung (wenn bspw. die Quittung verloren geht) besteht die Möglichkeit, dass der Empfänger ein Paket doppelt erhält.
+	Damit er diesen Fall erkennen kann, wird jedes Paket $P_i$ mit einer Sequenznummer $s(P_i)$ versehen, für die gilt:
+
+	\begin{equation*}
+		s(P_i) = s(P_{i-1}) + 1
+	\end{equation*}
+
+	Um das oben beschriebene Problem für Stop-and-Wait zu lösen, reicht eine Sequenznummer von einem Bit.
+	Es muss nur unterschieden werden können, ob das erhaltene Paket ein gerades oder ungerades ist.
+	Diese Stop-and-Wait-Variante nennt man Alternating Bit Protocol (ABP).
+
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.6\textwidth]{images/04-stop-and-wait.png}
+		\end{center}
+		\caption{Stop-and-Wait mit 1-Bit-Sequenznummern (Alternating Bit Protocol)}
+	\end{figure}
+
+	Zusätzlich wird CRC zur Prüfung von Bitfehlern verwendet.
+	Der Empfänger verwirft Pakete mit ungültiger CRC.
+
+	\paragraph{Bewertung}
+
+	Für ABP/Stop-and-Wait gilt für die Gesamtübertragungsdauer eines Pakets (unter Vernachlässigung der Verarbeitungszeiten, Sendezeit der Quittung, etc.):
+
+	\begin{align*}
+		t_{Ges} &= t_s(\text{Daten}) + t_a + t_V(\text{Daten}) + t_s(\text{Quittung}) + t_a + t_V(\text{Quittung}) \\
+		&\approx t_s(\text{Daten}) + 2t_a
+	\end{align*}
+
+	Die Auslastung ist also:
+
+	\begin{align*}
+		U &= \frac{t_s}{t_{Ges}} = \frac{t_s}{t_s + 2t_a} = \frac{1}{1 + 2t_a/t_s} \\
+		&= \frac{1}{1 + 2a}
+	\end{align*}
+
+	% TODO: weiter ausführen, siehe folien
+
 	\subsubsection{Go-Back-N}
+
+	Go-Back-N ist eine Generalisierung des Stop-and-Wait-Verfahrens zur Erhöhung der Leistungsfähigkeit.
+	Der Sender kann hier mehrere Pakete versenden, bis er eine Quittung erhalten muss.
+	Die maximale Anzahl nicht quittierter Pakete ist typischerweise durch das sogenannte Sendefenster $W$ begrenzt (für $W = 1$ ist Go-Back-N identisch mit Stop-and-Wait).
+	Der Empfänger quittiert den Empfang eines Pakets i.d.R. mit einer kumulativen Quittung (\enquote{ich habe dieses Paket und alle vorhergehenden erhalten}).
+	
+	Wird ein Paket empfangen, das fehlerhaft oder außerhalb der Reihenfolge ist, wird es vom Empfänger verworfen.
+	Der Sender hält für jedes gesendete Paket einen Timeout; läuft dieser für ein bestimmtes Paket ab, springt er in der Übertragungsreihenfolge zu diesem Paket zurück.
+
+	Dies bedeutet, dass mindestens der Sender einen Paketpuffer für diejenigen Pakete bereitstellen muss, deren Sendung eventuell wiederholt werden muss.
+	Auch der Empfänger kann mit einem Puffer arbeiten, wenn Pakete nicht direkt an die darüberliegende Schicht weitergeleitet werden können.
+
+	\paragraph{Bewertung}
+
+	Man unterscheidet bei der Bewertung des Go-Back-N-Verfahrens:
+
+	\begin{itemize}
+		\item Fenstergröße $W \geq 1 + 2a$: Der Sender kann ohne Pause senden; der Übertragungsabschnitt ist zu 100 \% ausgelastet.
+		\item Fenstergrüße $W < 1 + 2a$: Sender kann nach dem \enquote{Aufbrauchen} des Fenster nicht weiter senden.
+	\end{itemize}
+
+	Für die erzielbare Auslastung gilt also:
+
+	\begin{equation*}
+		U = \begin{cases}
+			1 & \text{für } W \geq 1 + 2a \\
+			\frac{W}{1 + 2a} & \text{sonst}
+		\end{cases}
+	\end{equation*}
 
 	\subsubsection{Selective Repeat}
 
+	Anders als bei Go-Back-N werden vom Empfänger selektive (nicht kumulative) Quittungen erteilt.
+	Pakete, die außerhalb der Reihenfolge empfangen werden, puffert der Empfänger, bis alle vorhergehenden Pakete empfangen wurden.
+	Läuft der Timeout für die Quittung eines Pakets beim Sender ab, wird diese erneut gesendet.
+
+	Selective Repeat reduziert das Datenaufkommen im Vergleich zu Go-Back-N, da im Fehlerfall nur einzelne Pakete wiederholt werden.
+
 	\subsubsection{Selective Reject}
+
+	Selective Reject verhält sich bis auf das Quittierungsverhalten des Empfängers identisch zu Selective Repeat.
+	Statt eines Timeouts auf der Seite des Senders wird jedoch der Empfänger selbst aktiv, wenn er merkt, dass ein Paket fehlt.
+	Empfängt er ein Paket, dessen vorhergehende Pakete nicht (korrekt) empfangen wurden, sendet er eine spezielle \enquote{negative} Quittung (SREJ(Sequenznummer)) für jedes fehlende Paket.
+	Empfängt der Sender eine solche negative Quittung, wiederholt er sofort das Paket, statt auf einen Timeout zu warten.
 
 	\subsection{Flusskontrolle}
 
