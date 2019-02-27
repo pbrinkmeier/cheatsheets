@@ -1099,13 +1099,119 @@
 
 	\subsection{Flusskontrolle}
 
+	Ein Problem, das (nicht nur) auf der Sicherungsschicht auftreten kann, ist, das der Empfänger vom Sender überlastet werden kann.
+	In diesem Fall müssen Pakete verworfen werden, da der Empfangspuffer nicht ausreichend groß ist.
+	Der Sender sollte also die Größe des Empfangspuffers berücksichtigen.
+
+	\paragraph{Closed-Loop-Flusskontrolle}
+
+	Rückkopplung, um zu verhindern, dass der Empfänger überschwemmt wird.
+	Der Sender adaptiert seinen Datenstrom entsprechend.
+
+	Diese Variante der Flusskontrolle wird im Folgenden betrachtet.
+	Sie wird im Internet eingesetzt.
+
+	\paragraph{Open-Loop-Flusskontrolle}
+
+	Beschreibung des Verkehrs in Richtung des Empfängers, anschließende Ressourcenreservierung und Überwachung des eingehenden Verkehrs.
+
+	Diese Variante wird im Internet i.d.R. nicht eingesetzt und soll hier nicht weiter betrachtet werden.
+
 	\subsubsection{Halt-und-Weiter}
+
+	Bei Halt-und-Weiter kann der Empänger dem Sender die Meldungen \enquote{Halt} und \enquote{Weiter} senden.
+	\enquote{Halt} bedeutet dem Sender, dass der Empfänger nicht mehr schritthalten kann; \enquote{Weiter} bedeutet ihm nach einer \enquote{Halt}-Meldung, dass der Empfänger wieder bereit ist.
+	
+	Halt-und-Weiter wird beispielsweise bei Fast-Ethernet oder Gigabit-Ethernet eingesetzt.
+
+	\paragraph{Bewertung}
+
+	\begin{itemize}
+		\item Nur auf Vollduplex-Links einsetzbar.
+		\item Bei hoher (Ausbreitungs-)Verzögerung nicht effektiv.
+		\item Probleme bei Verlust der \enquote{Halt}-Meldung.
+	\end{itemize}
 
 	\subsubsection{Kreditbasierte Flusskontrolle}
 
+	Der Sender kann nur eine begrenzte Menge Daten (Pakete/Bytes) senden, ohne eine Quittung erhalten zu haben.
+	Diese Menge repräsentiert die Pufferkapazität des Empfängers.
+	Sie wird \emph{Sendekredit} genannt.
+
+	% TODO: sliding window if important
+
 	\subsection{Verbindungen}
 
+	Unter einer (Kommunikations-)Verbindung versteht man eine Kommunikationsbeziehung zwischen zwei oder mehreren Kommunikationspartnern.
+	Eine Verbindung ist durch den bei den Kommunikationspartnern jeweils etablierten gemeinsamen (Verbindungs-)Kontext (bspw. Sequenznummern, Fenstergrößen) charakterisiert.
+
+	Eine Verbindung stellt die Basis für die Bereitstellung zuverlässiger Dienste bereit.
+
+	\paragraph{Verbindungsorientierte Kommunikation}
+
+	\begin{itemize}
+		\item Verbindungsaufbau (Etablierung eines Verbindungskontexts)
+		\item Datenaustausch
+		\item Verbindungsabbau (Löschen des Kontexts, Freigeben von Puffern, etc.)
+	\end{itemize}
+
+	Verbindungsorientierte Kommunikation hat den Vorteil, dass beim Aufbau der Verbindung die Parameter des Kontexts ausgehandelt werden können.
+	Außerdem kann nur auf diese Weise ein zuverlässiger Dienst bereitgestellt werden.
+
+	Der Aufbau der Verbindung verzögert jedoch auch den tatsächlichen Datenaustausch.
+	Dies merkt man beispielsweise beim Abruf von Webseiten.
+	Modernere Protokolle sehen Datenaustausch bereits während des Verbindungsaufbaus vor, um dem entgegenzuwirken.
+
+	\paragraph{Verbindungslose Kommunikation}
+
+	Der Datenaustausch findet sofort statt.
+	Es wird kein Kommunikationskontext zwischen den Partnern etabliert.
+
+	Diese Art der Kommunikation ist zwar schnell, jedoch unzuverlässig; es besteht keine Möglichkeit der Kontrolle, ob Daten überhaupt angekommen sind (unzuverlässiger Dienst).
+
+	\subsubsection{2-Wege-Handshake}
+
+	Zum Verbindungsaufbau sendet der Sender einen Connect-Request an den Empfänger und wartet auf dessen Bestätigung.
+
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.6\textwidth]{images/04-2-way-handshake.png}
+		\end{center}
+		\caption{2-Wege-Handshake}
+	\end{figure}
+
+	Ein Problem an dieser Art des Verbindungsaufbaus besteht darin, dass der Empfänger bei Verlust dieser Bestätigung die Verbindung als hergestellt betrachtet, auch wenn sie es nicht ist.
+
+	\subsubsection{3-Wege-Handshake}
+
+	Dieses Problem löst der 3-Wege-Handshake durch eine erneute Bestätigung der Bestätigung seitens des Senders.
+
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.6\textwidth]{images/04-3-way-handshake.png}
+		\end{center}
+		\caption{3-Wege-Handshake}
+	\end{figure}
+
 	\section{Vermittlungsschicht}
+
+	\subsection{Netztopologien}
+
+	\subsubsection{Vollvermaschtes Netz}
+
+	\subsubsection{Baum}
+
+	\subsubsection{Stern}
+
+	\subsubsection{Ring}
+
+	\subsubsection{Bus}
+
+	\subsection{Multiplexverfahren}
+
+	\subsection{Medienzuteilung}
+
+	\subsection{Ethernet}
 
 	\section{Transportschicht}
 
