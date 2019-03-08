@@ -1193,25 +1193,175 @@
 		\caption{3-Wege-Handshake}
 	\end{figure}
 
-	\section{Vermittlungsschicht}
-
 	\subsection{Netztopologien}
 
 	\subsubsection{Vollvermaschtes Netz}
 
-	\subsubsection{Baum}
+	In einem vollvermaschten Netz ist jedes Gerät physisch mit jedem anderen verbunden.
+	Bei $n$ Geräten erfordert dies $\frac{n(n - 1)}{2} \in O(n^2)$ Links.
+	Dieser Ansatz daher ist bei großen Netzen nicht einsetzbar.
 
-	\subsubsection{Stern}
+	\subsubsection{Teilvermaschtes Netz}
 
-	\subsubsection{Ring}
+	Im Gegensatz dazu sind in einem teilvermaschten Netz nur ein Teil der Geräte physisch verbunden.
+	Kommunikation zwischen nicht verbundenen Geräten muss über Zwischensysteme erfolgen.
 
-	\subsubsection{Bus}
+	\paragraph{Baum}
+
+	Netzgraph ist in Baumform; Blätter sind Endsysteme bzw. Netzrand.
+	Dieser Topologie wird bspw. im klassischen Telefonnetz eingesetzt.
+
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.6\textwidth]{images/04-tree-topology.png}
+		\end{center}
+		\caption{Baumtopologie}
+	\end{figure}
+
+	\paragraph{Stern}
+
+	Baumtopologie, bestehend nur aus der Wurzel und den Blättern.
+	Es gibt also genau eine zentrale Komponente, zu der jedes Gerät eine physische Verbindung hat.
+	Diese Komponente ist ein sogenannter \enquote{single point of failure}.
+
+	\paragraph{Ring}
+
+	Der Netzgraph bildet einen einzigen Zyklus.
+	Jedes Gerät ist also mit genau zwei anderen physisch verbunden.
+
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.3\textwidth]{images/04-ring-topology.png}
+		\end{center}
+		\caption{Ringtopologie}
+	\end{figure}
+
+	\paragraph{Bus}
+
+	Alle Geräte sind über einen physischen Link verbunden (wie bspw. bei der MiMa).
+
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.3\textwidth]{images/04-bus-topology.png}
+		\end{center}
+		\caption{Bustopologie}
+	\end{figure}
 
 	\subsection{Multiplexverfahren}
 
+	Unter Multiplexen versteht man die simultane Nutzung eines physischen Links durch mehrere Signale.
+	Ziel dabei ist die optimale Nutzung der verfügbaren Ressourcen.
+
+	\subsubsection{Raummultiplex}
+
+	% TODO
+
+	\subsubsection{Frequenzmultiplex}
+
+	% TODO
+
+	\subsubsection{Zeitmultiplex}
+
+	Bei Zeitmulitplex (auch: Time Division Multiple Access, TDMA) wird die Zeit aufgeteilt in Abschnitte (Zeitschlitze, time slots), während deren die gesamte Bandbreite von einem Signal genutzt werden kann.
+	Die Abschnitte können unterschiedlicher Länge sein und wiederholen sich i.d.R. periodisch.
+
+	\paragraph{Statisch}
+
+	Einteilung der Zeitschlitze erfolgt offline und ändert sich während des Betriebs nicht.
+	Wird häufig in der Automatisierungstechnik (\enquote{Industrial Internet}) eingesetzt.
+
+	\paragraph{Dynamisch-Fest}
+
+	Während des Betriebs wird die Einteilung der Zeitschlitze über spezielle \enquote{Signalisierungsprotokolle} ausgemacht.
+	Eingesetzt bspw. bei GSM (Sprach- und Datenübertragung).
+
+	\paragraph{Dynamisch-Variabel}
+
+	Zugriff erfolgt on-demand ohne Nutzung eines dedizierten Protokolls.
+	Eingesetzt bspw. bei Ethernet oder WLAN.
+
+	\subsubsection{Codemultiplex}
+
+	% TODO
+
 	\subsection{Medienzuteilung}
 
+	\paragraph{Ausgangssituation}
+
+	Häufiges Kommunikationsmuster: On-Off.
+	On: Daten werden mit höchster verfügbarer Datenrate versendet.
+	Off: es sind keine Daten zu senden.
+
+	In der Regel ist die On-Zeit deutlich kürzer als die Off-Zeit.
+	Außerdem ist es unklar, zu welchem Zeitpunkt eine On-Phase beginnt.
+	Dies ist vergleichbar mit der Kommunikation über Telefon.
+
+	In lokalen Netzen werden Verfahren zur variablen on-demand Medienzuteilung (Media Access Control, MAC) eingesetzt.
+
+	\subsubsection{Aloha}
+
+	% TODO
+
+	Erstes MAC-Protokoll für paketbasierte drahtlose Netze.
+
+	\begin{itemize}
+		\item Zeitmultiplex, variabel, zufälliger Zugriff.
+		\item Keine vorhergehende Medienüberprüfung/Ankündigung des Signals.
+		\item Asynchroner Zugriff.
+		\item Kollisionen möglich.
+	\end{itemize}
+
+	Aufgetretene Kolliosonen können auf verschiedene Weisen erkannt und behandelt werden:
+
+	\begin{itemize}
+		\item \emph{Explizite Kollisionserkennung} --- Höhere Schichten versenden Bestätigungen auf separatem Kommunikationskanal.
+		\item \emph{Implizite Kollisionserkennung} --- Empfänger broadcastet empfangenes Signal an alle andere Geräte; Sender erhält in dieser Form eine Empfangsquittung.
+	\end{itemize}
+
+	Einer erkannten Kollision folgt i.d.R. eine Sendewiederholung.
+	Da diese nicht wieder zu einer Kollision führen soll, wird ihr Zeitpunkt zufällig festgelegt.
+
+	\paragraph{Slotted Aloha}
+
+	Bei Slotted Aloha erfolgt zusätzlich eine Aufteilung in Zeitschlitze.
+	Im Mittel hat Slotted Aloha weniger Kollisionen als Aloha.
+
+	\subsubsection{CSMA}
+
+	CSMA steht für Carrier Sense Multiple Access.
+	Vor dem Senden eines Signals prüft der Sender, ob das Medium frei ist (\emph{Listen before Talk}, vgl. \enquote{Wenn ich rede hörst du zu}).
+	Ist es belegt, versucht er es später wieder; ist das Medium frei, fängt er an zu senden.
+
+	Auch hier kann es Kollisionen kommen, wenn zwei Sender gleichzeitig anfangen zu senden.
+
+	\paragraph{CSMA-CD}
+
+	Während des Sendens prüft der Sender, ob es auf dem Medium zu einer Kollision kommt (\emph{Listen while Talk}).
+	Im diesem Fall wird das Senden abgebrochen und zu einem späteren Zeitpunkt erneut versucht.
+
+	\paragraph{CSMA-CA}
+
+	Sendende Station schließt bei Ausbleiben einer Quittung auf Kollision (bspw. WLAN).
+
+	\subsubsection{Token Passing}
+
+	% TODO
+
 	\subsection{Ethernet}
+
+	\subsubsection{Standardisierung}
+
+	\subsubsection{Protokoll}
+
+	\subsubsection{Kopplung von Ethernets}
+
+	\subsubsection{Kollisionsdomäne}
+
+	\subsubsection{Technische Varianten}
+
+	\subsubsection{VLAN}
+
+	\section{Vermittlungsschicht}
 
 	\section{Transportschicht}
 
