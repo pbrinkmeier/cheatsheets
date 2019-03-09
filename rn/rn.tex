@@ -1070,7 +1070,7 @@
 
 	\begin{itemize}
 		\item Fenstergröße $W \geq 1 + 2a$: Der Sender kann ohne Pause senden; der Übertragungsabschnitt ist zu 100 \% ausgelastet.
-		\item Fenstergrüße $W < 1 + 2a$: Sender kann nach dem \enquote{Aufbrauchen} des Fenster nicht weiter senden.
+		\item Fenstergröße $W < 1 + 2a$: Sender kann nach dem \enquote{Aufbrauchen} des Fenster nicht weiter senden.
 	\end{itemize}
 
 	Für die erzielbare Auslastung gilt also:
@@ -1094,7 +1094,7 @@
 
 	Selective Reject verhält sich bis auf das Quittierungsverhalten des Empfängers identisch zu Selective Repeat.
 	Statt eines Timeouts auf der Seite des Senders wird jedoch der Empfänger selbst aktiv, wenn er merkt, dass ein Paket fehlt.
-	Empfängt er ein Paket, dessen vorhergehende Pakete nicht (korrekt) empfangen wurden, sendet er eine spezielle \enquote{negative} Quittung (SREJ(Sequenznummer)) für jedes fehlende Paket.
+	Empfängt er ein Paket, dessen vorhergehende Pakete nicht (korrekt) empfangen wurden, sendet er eine spezielle \enquote{negative} Quittung SREJ(Sequenznummer) für jedes fehlende Paket.
 	Empfängt der Sender eine solche negative Quittung, wiederholt er sofort das Paket, statt auf einen Timeout zu warten.
 
 	\subsection{Flusskontrolle}
@@ -1362,6 +1362,273 @@
 	\subsubsection{VLAN}
 
 	\section{Vermittlungsschicht}
+
+	\subsection{Paketvermittlung}
+
+	Bei Paketvermittlung (\emph{Packet Switching} werden Daten in Pakete gegliedert zu den Zielsystemen weitergeleitet.
+	Hierzu führen Pakete \emph{Metainformationen} mit sich.
+
+	\begin{figure}
+		\includegraphics[width=\textwidth]{images/05-packet-switching.png}
+		\caption{Paketvermittlung}
+	\end{figure}
+
+	Pakete werden abschnittsweise über Zwischensysteme übermittelt.
+	Gegegebenenfalls erfolgt in diesen Zwischensystemen Pufferung von Paketen.
+	Durch die begrenzte Kapazität dieser Puffer können Pakete verloren gehen.
+
+	\subsection{Prinzipien}
+
+	Auf der Vermittlungsschicht werden Pakete typischerweise als Datagramme bezeichnet.
+	Zwischensysteme nennt man \emph{Router}.
+	Protokolle der Vermittlungsschicht finden in allen Endsystemen und Routern Anwendung.
+
+	Die Vermittlungsschicht hat in einem Rechnernetz zwei grundlegende Aufgaben:
+
+	\paragraph{Kontrollebene --- Wegewahl}
+
+	Wegewahl bzw. Routing ermittelt den Weg/Pfad, den Pakete zurücklegen.
+	Hier kommen Routingalgorithmen und -protokolle zum Einsatz.
+
+	\paragraph{Datenebene --- Weiterleitung}
+
+	Weiterleitung bzw. Forwarding leitet Pakete innerhalb eines Routers vom Eingang zu einem geeigneten Ausgang weiter.
+
+	\subsubsection{Routingprotokoll}
+
+	Ein Routingprotokoll ist ein Protokoll der Vermittlungsschicht, das für die Wegewahl verantwortlich ist.
+
+	\subsubsection{Routingalgorithmus}
+
+	Ein Routingalgorithmus wird für die Wegewahl eingesetzt.
+	Routingprotokolle setzten Routingalgorithmen in Rechnernetzen um.
+
+	\subsubsection{Weiterleitungstabelle}
+
+	Die Weiterleitungstabelle enthält für ein mögliches Ziel $Z$ Tupel der Form $(Z, I)$, wobei $I$ ein Interface bezeichnet, auf dem Datagramme in Richtung $Z$ weitergeleitet werden.
+	Die Einträge der Weiterleitungstabelle werden von Rountingprotokollen geliefert.
+	Damit bildet diese die Schnittstelle zwischen Kontroll- und Datenebene.
+
+	\subsection{Kontrollebene}
+
+	Hier wird ein Rechnernetz als Graph modelliert.
+	Router bzw. Zwischensysteme sind Knoten; Übertragungsabschnitte sind Kanten.
+	Kanten sind bspw. nach Ausbreitungsverzögerung oder aktueller Last gewichtet.
+
+	Das Ziel eines Routingsprotokolls ist es, in diesem Graphen einen (nach bestimmten Kriterien) guten Weg zu finden.
+	Die Qualität eines Weges kann auf verschiedene Weisen gemessen werden.
+	Das sind bspw. die geringste Zahl von Hops, der schnellste Weg, der am wenigsten ausgelastete Weg, der Weg mit den geringsten monetären Kosten, etc.
+
+	Ein Routingalgorithmus findet einen solchen Weg.
+
+	\subsubsection{Routingalgorithmen --- Grundlagen}
+
+	\paragraph{Statisches Routing}
+
+	Weiterleitungstabellen ändern sich nicht.
+
+	\paragraph{Zentralisiertes Routing}
+
+	Wegewahl wird durch eine zentrale Komponente getroffen.
+	Diese benötigt eine globale Sicht auf das Netz, um Weiterleitungstabellen für Zwischensysteme erstellen zu können.
+
+	\paragraph{Dezentrales Routing}
+
+	Wegewahl wird dezentral in den Zwischensystemen durchgeführt.
+	Keine zentrale Komponente ist erforderlich.
+	Man unterscheidet zwischen \emph{isoliertem} dezentralem Routing, wobei Zwischensysteme keinen Informationsaustausch untereinander vornehmen, und \emph{verteiltem} dezentralem Routing, bei dem Zwischensysteme Informationen mit ihren Nachbarn austauschen.
+
+	\paragraph{Dynamisches Routing}
+
+	Bei nicht-statischem Routing unterscheidet man zusätzlich \emph{nicht adaptives} von \emph{adaptivem} Routing.
+	Adaptives Routing reagiert aktiv auf Änderungen des Verkehrs bzw. der Netztopologie.
+
+	\subsubsection{Zentralisiertes Routing}
+
+	Hier existiert eine zentrale Komponente, das \emph{Routing Control Center} (RCC).
+	Jedes andere System sendet periodisch Zustandsinformation and das RCC (Liste aktiver Nachbarn, aktuelle Länge der Warteschlangen, Verkehsaufkommen, etc.).
+	Aus dieser Information berechnet das RCC optimale Wege durch das Netz.
+	Entsprechende Weiterleitungsinformation wird an alle Router verteilt.
+
+	Theoretisch hat das RCC vollständige Übersicht über das Netz und kann perfekte Entscheidungen treffen.
+	Router selbst müssen sich nicht mit Routingberechnungen befassen und können sich um die Weiterleitung kümmern.
+
+	Andererseits dauert die Berechnung für große Netze u.U. sehr lange.
+	Ein Ausfall des RCC lässt das Netz in einem statischen, in Zukunft eventuell nicht-optimalen Zustand zurück.
+	Außerdem sind Inkonsistenzen möglich, da manche Systeme noch die alten Weiterleitungstabellen halten können.
+
+	\subsubsection{Fluten}
+
+	Isoliert, nicht adaptiv.
+	Eingehendes Datagramm wird auf jedem Interface, außer dem, auf dem es empfangen wurde, weitergeleitet.
+
+	Zur Eindämmung des Verkehrsaufkommens kann man Duplikationserkennung durch Sequenznummern und einführen und die Lebenszeit eines Datagrammes durch ein TTL-Feld (time to live) begrenzen.
+
+	\subsubsection{Hot Potato}
+
+	Weiterleitung auf dem Interface mit der kürzesten Wartezeit (Warteschlangenlänge), um Datagramme so schnell wie möglich weiterzuleiten.
+	Wie bei Fluten wird nie das Eingangsinterface verwendet.
+
+	\subsubsection{Distanz-Vektor-Routing}
+
+	\paragraph{Distanz-Vektor-Tabelle}
+
+	Die Distanz-Vektor-Tabelle ist die grundlegende Datenstruktur für DV-Algorithmen.
+	Sie ist in jedem System vorhanden.
+	Sie enthält eine Zeile für jedes mögliche Ziel im Netzwerk und eine Spalte für jeden ihrer Nachbarn.
+	Im System $S$ hat der Eintrag für Zeile $Z$ und Spalte $N$ den Wert $D^S(Z, N)$.
+	Dabei bezeichnet $D^S(Z, N)$ die gesamte Distanz zwischen $S$ und $Z$ über den Nachbarn $N$ und ist definiert als:
+
+	\begin{align*}
+		\text{Distanz zwischen $A$ und $B$: } &c(A, B) \\
+		D^S(Z, N) = &c(S, N) + min(\{ M \in \text{nachbarn}(N) : D^N(Z, M) \})
+	\end{align*}
+
+	% TODO: Algorithmus, Beispiel
+
+	\subsubsection{Link-State-Routing}
+
+	Bei Link-State-Routing kennt ein System zunächst nur seine direkten Nachbarn.
+	Neue Nachbarn werden mittels spezieller Routingnachrichten (\enquote{HELLO}) entdeckt und die Kosten der direkten Kanten ermittelt.
+
+	Durch den sog. \emph{Link State Broadcast} werden die Daten dieser direkten Karten an alle Router im Netz weitergeleitet.
+	Indem sie die Link State Broadcasts anderer System empfangen, lernen System die Topologie des gesamten Netzes kennen.
+	Alle Systeme haben identisches Wissen über das Netz.
+
+	Ein \emph{Link-State-Algorithmus} berechnet nun in jedem System die kürzesten Pfade zu allen anderen Systemen (bspw. Dijkstra-Algorithmus).
+	Die berechneten Pfade sind aufgrund des identischen Wissens für jedes System gleich.
+	Das System ist schleifenfrei und konvergiert in einen stabilen Zustand.
+
+	\begin{figure}
+		\includegraphics[width=\textwidth]{images/05-link-state-dijkstra.png}
+		\caption{Dijkstra-Algorithmus ausgehend von A}
+	\end{figure}
+
+	\subsection{Datenebene}
+
+	\subsubsection{IP-Adressen}
+
+	IP-Adressen dienen der eindeutigen Identifikation angeschlossener Geräte bzw. deren Interfaces.
+	Ein Gerät kann mehrere Interfaces haben (bspw. zusätzliche Ethernet-Karte, WLAN, Mobilfunk).
+
+	\paragraph{IPv4}
+
+	IPv4-Adressen haben eine Länge von 32 Bit und werden geschriebn als $A_3 . A_2 . A_1 . A_0$ mit
+
+	\begin{align*}
+		\text{Adresse: } A &= (b_{31}, ..., b_0), b_k \in \mathbb{B} \\
+		A_i &= \text{dec}(A_{8i + 7; 8i})
+	\end{align*}
+
+	Beispiel:
+
+	\begin{align*}
+		A &= 1101111 00000001 00000001 00000001 \\
+		&= 223.1.1.1
+	\end{align*}
+
+	\paragraph{IPv6}
+
+	IPv6-Adressen haben eine Länge von 128 Bit.
+	Zunächst beschäftigen wir uns nur mit IPv4.
+
+	\subsubsection{Gliederung von IP-Adressen}
+
+	IP-Adressen werden gegliedert in einen Subnetz-Teil und einen Endsystem-Teil.
+	Der Subnetz-Teil kann für verschiedene Subnetze verschiedene Längen haben und ist innerhalb eines Subnetzes immer gleich.
+	IP-Adressen mit Subnetzangabe werden notiert als $A_3.A_2.A_1.A_0/x$, wobei $x$ die Länge des Subnetz-Teils in Bits ist.
+	Beispielsweise ist für $192.168.0.17/24$ das Präfix $192.168.0$ für alle Endsysteme im Subnetz gleich; die $17$ identifiziert ein einzelnes Endsystem innerhalb des Subnetzes.
+
+	\subsubsection{Subnetze}
+
+	Interfaces mit demselben Subnetz-Teil bilden eine Subnetz und können sich ohne zwischengeschaltenen Router erreichen.
+
+	\begin{figure}
+		\includegraphics[width=\textwidth]{images/05-subnets.png}
+		\caption{Subnetze}
+	\end{figure}
+
+	\subsubsection{Internet Protocol (IP)}
+
+	Verbindsloser unzuverlässiger Vermittlungsdienst.
+	Verantwortlich nur für die Weiterleitung von IP-Datagrammen im Internet.
+	
+	\begin{figure}
+		\includegraphics[width=\textwidth]{images/05-ip-datagram.png}
+		\caption{Format eines IP-Datagramms}
+	\end{figure}
+
+	\paragraph{Fragmentierung}
+
+	Verschiedene Netze können unterschiedliche maximale Rahmenlängen erlauben (MTU: Maximum Transfer Unit).
+	Daher erlaubt es IP, IP-Rahmen in jedem System und Zwischensystem zu fragmentieren, also in mehreren Rahmen zu übertragen.
+	
+	Hierzu werden die \emph{Flag}-Felder des IP-Kopfs verwendet:
+
+	\begin{itemize}
+		\item Bit 0 = 0 (reserviert)
+		\item Bit 1 = $\begin{cases} 0 & \text{darf fragmentiert werden} \\ 1 & \text{darf nicht fragmentiert werden} \end{cases}$
+		\item Bit 2 = $\begin{cases} 0 & \text{letztes Fragment} \\ 1 & \text{weitere Fragmente folgen} \end{cases}$
+		\item Fragment-Offset = Position des Fragments in ursprünglichem Datagramm (Einheit: 8 Bytes)
+	\end{itemize}
+
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.6\textwidth]{images/05-ip-fragmentation.png}
+		\end{center}
+		\caption{Beispiel für Fragmentierung von IP-Rahmen}
+	\end{figure}
+
+	\paragraph{Weiterleitung in IP}
+
+	In einem Endsystem werden IP-Datagramme, deren Zieladresse im Subnetz liegt, direkt verschickt; liegt die Adresse nicht im Subnetz, wird das Datagramm an einen voreingestellten Router weitergegegeben.
+	
+	Router haben eine Weiterleitungstabelle mit Einträgen für Ziel-Netz, nächstem Hop (Router) und dem entsprechenden Interface.
+	Außerdem gibt es Flags, die jeden Einträg genauer beschreiben können.
+
+	% TODO: Bsp.
+
+	\subsubsection{DHCP}
+
+	\begin{itemize}
+		\item DHCP-Discover: an Broadcast-Adresse (255.255.255.255), mit TID\textsubscript{1} (optional).
+		\item DHCP-Offer: an BC-Adresse, mit TID\textsubscript{1}, DHCP-Server bietet Adresse an (optional).
+		\item DHCP-Request: an BC-Adresse mit Adressanfrage und TID\textsubscript{2}.
+		\item DHCP-ACK: an vergebene Adresse, mit TID\textsubscript{2}.
+	\end{itemize}
+
+	DHCP (Dynamic Host Configuration Protocol) verteilt dynamisch IP-Adressen in einem Subnetz.
+	
+	Neben IP-Adressen können auch weitere Subnetz-spezifische Daten wie Adresse des Default-Routers, NTP-/DNS-Server, etc. an Endsysteme verteilt werden.
+
+	% TODO: mehr
+
+	\subsubsection{ICMP}
+
+	% TODO
+
+	\subsubsection{ARP}
+
+	Befindet sich der Empfänger eines Datagramms im selben Subnetz, muss der Sender die lokale (MAC-)Adresse des Empfängers kennen, um das Datagramm zuzustellen.
+	Das Adress Resolution Protocol (ARP) wird genutzt, um IP-Adressen zu MAC-Adressen aufzulösen.
+	
+	Jedes System hat einen sogenannten ARP-Cache, bei dem es sich um eine Tabelle mit den Spalten IP-Adresse, MAC-Adresse und \enquote{Lebenszeit} handelt.
+
+	\begin{itemize}
+		\item ARP-Request: mit Sender-IP, Sender-MAC, Empfänger-IP and (MAC-)BC-Adresse.
+		\item Empfänger mit passender IP sendet ARP-Reply and Sender-MAC, Sender-IP mit Empfänger-MAC und Empfänger-IP.
+		\item Sender empfängt ARP-Reply und trägt Information in seinen ARP-Cache ein.
+	\end{itemize}
+
+	% TODO: ARP-Spoofing
+
+	\subsection{Vermittlungstechniken}
+
+	% TODO: nicht besonders klausurrelevant
+
+	\subsection{Software-basierte Netze}
+
+	% TODO: nicht besonders klausurrelevant
 
 	\section{Transportschicht}
 
