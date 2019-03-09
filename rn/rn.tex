@@ -1513,7 +1513,7 @@
 
 	\paragraph{IPv4}
 
-	IPv4-Adressen haben eine Länge von 32 Bit und werden geschriebn als $A_3 . A_2 . A_1 . A_0$ mit
+	IPv4-Adressen haben eine Länge von 32 Bit und werden geschrieben als $A_3 . A_2 . A_1 . A_0$ mit
 
 	\begin{align*}
 		\text{Adresse: } A &= (b_{31}, ..., b_0), b_k \in \mathbb{B} \\
@@ -1631,6 +1631,108 @@
 	% TODO: nicht besonders klausurrelevant
 
 	\section{Transportschicht}
+
+	Die Transportschicht stellt Dienste zum Datenaustausch zwischen Anwendungsprozessen bereit.
+	Pakete werden typischerweise als Datagramme oder \emph{Segmente} bezeichnet.
+	Protokolle der Transportschicht sind in Endsystemen lokalisiert; Zwischensysteme sind i.d.R. Transportschicht-agnostisch.
+
+	\begin{figure}
+		\includegraphics[width=\textwidth]{images/06-transport-layer.png}
+		\caption{Einordnung der Transportschicht}
+	\end{figure}
+
+	Die Transportschicht stellt sowohl zuverlässige (Internet: TCP) als auch unzuverlässige Dienste (Internet: UDP) bereit.
+	Auf der Transportschicht können einzelne Anwendungsprozesse adressiert werden.
+	Segmente/Datagramme der Transportschicht werden in einem oder mehreren Datagrammen der Vermittlungsschicht übertragen.
+
+	\paragraph{Aufgaben der Transportschicht}
+	
+	Die grundlegende Aufgabe der Transportschicht ist das Verbergen von Details der transportorientierten Schichten vor höheren (anwendungsorientierten) Schichten.
+	Dabei kann nicht alles verborgen werden; bspw. sind Verzögerungen durch Paketverlust oder schwerwiegende Fehler weiterhin sichtbar.
+
+	Weiterhin stellt die Transportschicht Transportdienste bereit.
+	Sie bieten logische (= nicht physische) Kommunikationsbeziehungen zwischen Nutzern (= Prozessen).
+
+	Im wesentlichen kommen im Internet die Protokolle UDP (User Datagram Protocol) und TCP (Transport Control Protocol) zum Einsatz.
+	UDP bietet einen verbindungslosen, unzuverlässigen Transportdienst an; TCP bietet einen verbingdungsorientierten, zuverlässigen Transportdienst an.
+
+	\subsection{Client-Server-Architektur}
+
+	Wollen zwei Systeme untereinander kommunizieren, so müssen beide betriebsbereit sein.
+	In der Regel nehmen Systeme feste, verschiedene Rollen ein; oft bietet ein System Dienste für viele andere Systeme an.
+
+	\paragraph{Server}
+
+	Ein Server ist ein System, welches ständig betriebsbereit und erreichbar ist.
+	Es bietet vielen anderen Systemen, genannt Clients, Anwendungsdienste bereit.
+
+	Serversysteme haben i.d.R. eine feste IP-Adresse und leistungsfähige Hardware.
+	Oft werden sie in oder nahe an Rechenzentren platziert.
+
+	\paragraph{Client}
+
+	Ein Client ist ein System, welches Anwendungsdienste auf einem Server in Anspruch nehmen möchte.
+	Ein Client ist eventuell nicht immer im Betrieb oder erreichbar.
+	Er kommuniziert nur mit dem Server, nicht mit anderen Clients.
+
+	\subsection{Adressierung}
+
+	Auf der Transportschicht sollen Nutzer (= Anwendungsprozesse) auf einem System eindeutig gekennzeichnet werden.
+	Dies ermöglicht das Mulitplexen/Demultiplexen auf den Endsystemen.
+
+	\paragraph{Ports}
+
+	Ein Port ist eine Adresse der Transportschicht.
+	Bei Ports handelt es sich um unstrukturierte 16-Bit-Zahlen ($p \in \left[0; 65535\right] \subseteq \mathbb{N}_0$).
+	Innerhalb eines Endsystems sind Ports eindeutig.
+	Ein (IP-Adresse, Port)-Tupel identifiziert in einem Subnetz eindeutig einen Anwendungsprozess.
+	Untere Ports ($p \in \left[0; 1023\right]$) sind für häufig genutzte Anwendungen reserviert und dürfen i.d.R. nur von Systemprozessen verwendet werden.
+	Beispiele:
+
+	\begin{itemize}
+		\item SMTP (Simple Mail Transfer Protocol) --- Port 25
+		\item DNS (Domain Name System) --- Port 53
+		\item HTTP (HyperText Transfer Protocol) --- Port 80
+	\end{itemize}
+
+	\paragraph{Datenstrom}
+
+	Ein (Quelladresse, Quellport, Zieladresse, Zielport, Transportprotokoll)-Tupel identifiziert einen Datenstrom in einem Subnetz.
+
+	\subsection{UDP}
+
+	Das User Datagram Protocol (UDP) ist ein sehr einfaches in \href{https://tools.ietf.org/html/rfc768}{RFC 768} definiertes Transportprotokoll.
+	Es bietet einen unzuverlässigen Dienst an.
+	UDP kümmert sich um das Multiplexen und Demultiplexen für Anwendungsprozesse und Überprüfung von Bitfehlern durch eine Prüfsumme.
+
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.3\textwidth]{images/06-udp-segment.png}
+		\end{center}
+		\caption{Format eines UDP-Segments}
+	\end{figure}
+
+	\subsubsection{Eigenschaften von UDP}
+
+	\begin{itemize}
+		\item Geringer Overhead (\SI{8}{\byte}) durch Transportkopf.
+		\item Unreguliertes Senden --- UDP kann Daten so schnell senden, wie sie von der Anwendung geliefert und vom Netz abgenommen werden.
+		\item Best Effort --- Es werden keine Aussagen über die Auslieferung der Daten beim Empfänger getroffen.
+		\item Keine Verbindung --- Da keine Verbindung auf-/abgebaut werden und kein Verbindungszustand gehalten werden muss, entsteht dadurch kein Overhead.
+	\end{itemize}
+
+	\subsubsection{Einsatz von UDP}
+
+	\begin{itemize}
+		\item Interaktive Multimedia-Anwendungen (bspw. VoIP, Videostreams) --- zeitkritische, fehlertolerante Anwendungen.
+		\item DNS --- Schnelle Reaktion wünschenswert, i.d.R. nur ein einzelnes Antwortsegment.
+	\end{itemize}
+
+	Um zuverlässige Datenübertragung muss sich bei Nutzung von UDP die Anwendungsschicht kümmern.
+
+	% TODO: Internet-Prüfsumme
+
+	\subsection{TCP}
 
 	\section{Anwendungsschicht}
 
