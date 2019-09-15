@@ -1477,7 +1477,7 @@
 	Sie ist in jedem System vorhanden.
 	Sie enthält eine Zeile für jedes mögliche Ziel im Netzwerk und eine Spalte für jeden ihrer Nachbarn.
 	Im System $S$ hat der Eintrag für Zeile $Z$ und Spalte $N$ den Wert $D^S(Z, N)$.
-	Dabei bezeichnet $D^S(Z, N)$ die gesamte Distanz zwischen $S$ und $Z$ über den Nachbarn $N$ und ist definiert als:
+	Dabei bezeichnet $D^S(Z, N)$ die gesamte Distanz zwischen $S$ und $Z$ über den Nachbarn $N$ und es gilt:
 
 	\begin{align*}
 		\text{Distanz zwischen $A$ und $B$: } &c(A, B) \\
@@ -1733,6 +1733,68 @@
 	% TODO: Internet-Prüfsumme
 
 	\subsection{TCP}
+
+	Das in \href{https://tools.ietf.org/html/rfc793}{RFC 793} definierte Transmission Control Protocol (TCP) stellt einen verbindungsorientierten, zuverlässigen Transportdienst zum Datentransfer zwischen Anwendungsprozessen zur Verfügung.
+	TCP erhält von der Anwendungsschicht einen Bytestrom und übergibt TCP-Segmente an die Vermittlungsschicht (IP).
+
+	\paragraph{Senden eines TCP-Segments}
+	
+	Der Zeitpunkt, zu dem TCP ein TCP-Segment abschickt, ist für die Nutzer transparent.
+	Laut dem RFC gilt: \enquote{TCP should send that data in segments at its own convenience}.
+	Hierzu gibt es grundsätzlich folgende Alternativen:
+
+	\begin{itemize}
+		\item Maximum Segment Size (MSS) --- Sende Segment, wenn $x$ Bytes ungesendet sind ($x$ bspw. \SI{1460}{\byte} zur Vermeidung von IP-Fragmentierung).
+		\item Push-Flag (PSH) im TCP-Kopf --- Verlangt sofortiges Senden der Daten.
+		\item Zeitgeber --- Sende Daten nach Inaktivitätsintervall seitens der Anwendung.
+	\end{itemize}
+
+	\subsubsection{Eigenschaften von TCP}
+
+	\begin{itemize}
+		\item Verbindungsorientierter, zuverlässiger Dienst für Anwendungen.
+		\item Fehlerkontrolle --- Paketfehler (Sequenznummern, Quittungen, Sendewiederholung) und Bitfehler (Prüfsumme).
+		\item Flusskontrolle --- Empfänger soll nicht überlastet werden.
+		\item Staukontrolle --- Netz soll nicht überlastet werden.
+	\end{itemize}
+
+	\paragraph{Sequenznummern}
+
+	\paragraph{Quittungen}
+	
+	TCP nutzt positive kumulative Quittungen.
+	Eine Quittung enthält die Sequenznummer des nächsten erwarteten Bytes.
+
+	\subsubsection{Aufbau eines TCP-Segments}
+
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=\textwidth]{images/06-tcp-segment.png}
+		\end{center}
+		\caption{Format eines TCP-Segments}
+	\end{figure}
+
+	Ein TCP-Segment hat (u.A.) folgende Felder:
+
+	\begin{itemize}
+		\item Quell-/Ziel-Port --- Dienen der Adressierung (von Anwendungsprozessen) auf der Transportschicht.
+		\item Sequenznummer --- Zur Erkennung von Paketfehlern. Wird in \si{\byte} (Byte) gemessen, nicht in Segmenten.
+		\item Quittung --- Nächste vom Empfänger erwartete Sequenznummer.
+		\item Offset --- Zahl der 32-Bit-Wörter im TCP-Kopf. Dieser kann Optionen variabler Länge aufnehmen.
+		\item Bits:
+		\begin{itemize}
+			\item URG --- I.d.R. nicht benutzt; signalisiert, dass der Urgent-Pointer verwendet wird.
+			\item SYN --- Genutzt beim Verbindungsaufbau.
+			\item ACK --- Segment enthält eine Quittung.
+			\item FIN --- Gibt an, dass Sender keine Daten mehr senden möchte.
+			\item RST --- Wird benutzt, um Verbindung zurückzusetzen.
+			\item PSH --- I.d.R. nicht benutzt; signalisiert, dass übergebene Daten sofort weitergeleitet werden sollen.
+		\end{itemize}
+		\item Empfangsfenster --- Dient der Flusskontrolle.
+		\item Prüfsumme --- Enthält Prüfsumme über TCP-Kopf, Daten und Pseudoheader (wie bei UDP).
+		\item Urgent-Pointer --- Relativer Zeiger auf wichtige Daten; nur gültig, wenn URG-Bit gesetzt.
+		\item Optionen-Feld --- kann Optionen variabler Länge ($\leadsto$ Offset-Feld) aufnehmen.
+	\end{itemize}
 
 	\section{Anwendungsschicht}
 
