@@ -1,0 +1,113 @@
+\documentclass[a4paper, 16pt]{article}
+
+\usepackage[margin=3cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage[autostyle=true,german=quotes]{csquotes}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{multirow}
+\usepackage{array}
+% TODO: use \SI everywhere
+\usepackage[binary-units=true, per-mode=symbol]{siunitx}
+\usetikzlibrary{
+	calc
+}
+
+\newcommand{\cmi}{\mathrm{i}}
+\DeclareMathOperator{\sgn}{sgn}
+
+\author{Paul Brinkmeier}
+\title{Cheatsheet für HM I und HM II}
+
+\begin{document}
+	\maketitle
+	\newpage
+	\tableofcontents
+	\newpage
+
+	\section{Ableitung}
+
+	\begin{equation*}
+		(\log{x})' = \frac{1}{x}
+	\end{equation*}
+
+	\subsection{Trigonometrie}
+
+	\begin{equation*}
+		(\tan{x})' = \frac{1}{\cos^2{x}}
+	\end{equation*}
+
+	\section{Integration}
+
+	Sei $b > a$. Dann gilt:
+
+	\begin{equation*}
+		\int\limits_{-b}^{-a}{f(x)dx} = -\int\limits_{a}^{b}{f(x)dx}
+	\end{equation*}
+
+	\subsection{Partielle Integration}
+
+	\begin{equation*}
+		\int\limits_{a}^{b}{f' \cdot g} = \left[f \cdot g\right]_{a}^{b} - \int\limits_{a}^{b}{f \cdot g'}
+	\end{equation*}
+
+	\section{Identitäten}
+
+	\subsection{Trigonometrie}
+
+	\begin{eqnarray*}
+		&\cos^2 x + \sin^2 x = 1 \\
+		\Leftrightarrow &\cos^2 x = 1 - \sin^2 x \\
+		\Leftrightarrow &\sin^2 x = 1 - \cos^2 x
+	\end{eqnarray*}
+
+	\section{Grenzwerte}
+
+	\subsection{Gegen 0}
+
+	\begin{equation*}
+		\lim\limits_{n \to 0}{\frac{\sin x}{x}} = 1
+	\end{equation*}
+
+	\subsection{Gegen $\infty$}
+
+	\begin{equation*}
+		\lim\limits_{n \to \infty}{\left(1 + \frac{k}{n}\right)^n} = e^k
+	\end{equation*}
+
+	\section{Folgen}
+
+	\subsection{Folgen, die man kennen sollte}
+
+	\section{Reihen}
+
+	\subsection{Reihen, die man kennen sollte}
+
+	\subsubsection{Geometrische Reihe}
+
+	Sei $|k| < 1$. Dann gilt:
+	\begin{equation*}
+		\sum\limits_{n = 0}^{\infty}{k^n} = \frac{1}{1 - k}
+	\end{equation*}
+
+	Hierbei muss man immer beachten, dass die geometrische Reihe bei $n = 0$ anfängt.
+	In vielen Aufgaben ist nach $\sum_{n = 1}^{\infty}{k^n}$ gefragt:
+	
+	\begin{equation*}
+		\sum\limits_{n = 1}^{\infty}{k^n} = -1 + \sum\limits_{n = 0}^{\infty}{k^n},
+	\end{equation*}
+
+	da $k^0 = 1$.
+
+	\section{Komplexe Zahlen}
+
+	\subsection{Wurzel einer komplexen Zahl}
+
+	\begin{equation*}
+		\sqrt{z} = \sqrt{a + b\cmi} = \pm \left(\sqrt{\frac{|z| + a}{2}} + \cmi \cdot \sgn{b} \cdot \sqrt{\frac{|z| - a}{2}} \right)
+	\end{equation*}
+\end{document}
