@@ -110,4 +110,43 @@
 	\begin{equation*}
 		\sqrt{z} = \sqrt{a + b\cmi} = \pm \left(\sqrt{\frac{|z| + a}{2}} + \cmi \cdot \sgn{b} \cdot \sqrt{\frac{|z| - a}{2}} \right)
 	\end{equation*}
+
+	\section{Differentialgleichungen}
+
+	\subsection{Anfangswertprobleme}
+
+	Anfangswertprobleme sind üblicherweise in folgender Form gegeben:
+
+	\begin{equation*}
+		\textrm{AWP:}
+		\begin{cases}
+			y' &= f(x) \cdot g(y) + s(x) \\
+			y(x_0) &= y_0
+		\end{cases}
+	\end{equation*}
+
+	Eventuell muss man noch nach $y'$ umstellen.
+
+	\subsubsection{Trennung der Variablen}
+
+	Falls $s(x) = 0$ (deutlich einfacherer Fall):
+
+	\begin{equation*}
+		\textrm{AWP:}
+		\begin{cases}
+			y' &= f(x) \cdot g(y) \\
+			y(x_0) &= y_0
+		\end{cases}
+	\end{equation*}
+
+	\begin{enumerate}
+		\item Isoliere $f$ und $g$; $f$ ist der Teil von $y'$, der nur von $x$ abhängt; $g$ ist der Teil von $y'$, der nur von $y$ abhängt.
+		\item Löse folgende Gleichung nach $y$ auf:
+			\begin{equation*}
+				\int\limits_{x_0}^{x}{f(s)}ds = \int\limits_{y_0}^{y}{\frac{1}{g(t)}}dt
+			\end{equation*}
+		\item Bestimme maximales Intervall $I$, sodass $y$ für $x \in I$ wohldefiniert.
+	\end{enumerate}
+
+	\subsubsection{Mit Störfunktion}
 \end{document}
