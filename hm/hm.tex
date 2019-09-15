@@ -35,6 +35,12 @@
 		(\log{x})' = \frac{1}{x}
 	\end{equation*}
 
+	\subsection{In einem Punkt $x_0$}
+
+	\begin{equation*}
+		f'(x_0) = \lim\limits_{h \to 0}{\frac{f(x_0 + h) - f(x_0)}{h}}
+	\end{equation*}
+
 	\subsection{Trigonometrie}
 
 	\begin{equation*}
@@ -79,6 +85,16 @@
 		\lim\limits_{n \to \infty}{\left(1 + \frac{k}{n}\right)^n} = e^k
 	\end{equation*}
 
+	\subsubsection{$n^x \cdot q^n$}
+
+	Sei $q \in [0, 1)$. Dann gilt $\forall n \in \mathbb{N}$:
+
+	\begin{equation*}
+		\lim\limits_{n \to \infty}{n^x \cdot q^n} \to 0
+	\end{equation*}
+
+	Sprich: \enquote{Wenn $q < 1$ ist, geht $q^n$ schneller gegen 0 als $n^x$ mit beliebigem $x \in \mathbb{N}$ steigt.}.
+
 	\section{Folgen}
 
 	\subsection{Folgen, die man kennen sollte}
@@ -115,21 +131,7 @@
 
 	\subsection{Anfangswertprobleme}
 
-	Anfangswertprobleme sind üblicherweise in folgender Form gegeben:
-
-	\begin{equation*}
-		\textrm{AWP:}
-		\begin{cases}
-			y' &= f(x) \cdot g(y) + s(x) \\
-			y(x_0) &= y_0
-		\end{cases}
-	\end{equation*}
-
-	Eventuell muss man noch nach $y'$ umstellen.
-
 	\subsubsection{Trennung der Variablen}
-
-	Falls $s(x) = 0$ (deutlich einfacherer Fall):
 
 	\begin{equation*}
 		\textrm{AWP:}
@@ -149,4 +151,34 @@
 	\end{enumerate}
 
 	\subsubsection{Mit Störfunktion}
+
+	\begin{equation*}
+		\textrm{AWP:}
+		\begin{cases}
+			y' &= a(x) \cdot y + s(x) \\
+			y(x_0) &= y_0
+		\end{cases}
+	\end{equation*}
+
+	$s(x)$ nennt man die \emph{Störfunktion}.
+
+	\begin{enumerate}
+		\item Bestimme die Stammfunktion von $a(x)$: $A(x) = \int a(x) dx$.
+
+		\item Bestimme Lösung der homogenen Gleichung:
+
+		\begin{equation*}
+			y_h = c \cdot e^{A(x)}
+		\end{equation*}
+
+		\item Bestimme spezielle (= partikuläre (?)) Lösung der inhomogenen Gleichung:
+
+		\begin{equation*}
+			y_s = \int s(x) \cdot e^{-A(x)} dx \cdot e^{A(x)}
+		\end{equation*}
+
+		\item Allgemeine Lösung: $y = y_h + y_s$
+
+		\item Bestimme $c \in \mathbb{R}$ durch einsetzen der Anfangsbedingung.
+	\end{enumerate}
 \end{document}
